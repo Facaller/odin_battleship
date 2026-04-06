@@ -15,5 +15,18 @@ test('test initialisation', () => {
     expect(instance.sunk).toBe(false);
 });
 
-// Ship sunk tests
+// Ship class tests
+test('is ship sunk', () => {
+    const instance = new Ship(3, 2, false);
+    expect(instance.isSunk()).toBe(false);
+});
 
+test('ship is hit', () => {
+    const instance = new Ship(3, 0, false);
+    expect(instance.hit()).toBe(1);
+});
+
+test('ship hit does not exceed length', () => {
+    const instance = new Ship(3, 3, true);
+    expect(instance.hit()).toBe(3);
+});

@@ -4,5 +4,18 @@ export class Ship {
         this.hit    = hit;
         this.sunk   = sunk
     }
-//sunk logic
+
+    isSunk () {
+        if (this.length === this.hit) {
+            this.sunk = true;
+        }
+        return this.sunk;
+    }
+
+    hit () {
+        if (this.hit < this.length) {
+            this.hit++
+        }
+        return this.hit;
+    }
 }
