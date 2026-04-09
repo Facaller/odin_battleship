@@ -23,10 +23,10 @@ test('is ship sunk', () => {
 
 test('ship is hit', () => {
     const instance = new Ship(3, 0, false);
-    expect(instance.hit()).toBe(1);
+    expect(instance.isHit()).toBe(1);
 });
 
 test('ship hit does not exceed length', () => {
     const instance = new Ship(3, 3, true);
-    expect(instance.hit()).toBe(3);
+    expect(instance.isHit()).toBe(3);
 });

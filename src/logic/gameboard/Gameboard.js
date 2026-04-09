@@ -3,7 +3,7 @@ export class GameBoard {
         const rows = 24;
         const cols = 24;
 
-        const grid = Array.from({ length: rows }, () => 
+        this.grid = Array.from({ length: rows }, () => 
             Array.from({ length: cols }, () => ({
                 hit:     false,
                 miss:    false,
