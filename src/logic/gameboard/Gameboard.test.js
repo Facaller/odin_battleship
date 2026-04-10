@@ -8,3 +8,4 @@ test('test GameBoard initialisation', () => {
         hasShip: false
     });
 });
+
