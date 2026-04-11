@@ -1,5 +1,3 @@
-import { Ship } from "../ship/Ship.js";
-
 export class GameBoard {
     constructor () {
         const rows = 24;
@@ -16,7 +14,7 @@ export class GameBoard {
 
     placeShip (ship, x, y) {
         for (let i = 0; i < ship.length; i++) {
-            this.grid[x+i][y].ship = true;
+            this.grid[x+i][y].ship = ship;
         }
     }
 }
