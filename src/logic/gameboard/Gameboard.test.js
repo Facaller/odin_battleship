@@ -9,6 +9,8 @@ test('test GameBoard initialisation', () => {
     });
 });
 
+//placeShip
+
 test('check object placement in cell', () => {
     const newShip = {length: 3}
     const game = new GameBoard();
@@ -32,9 +34,26 @@ test('y placement inside grid', () => {
     expect(game.placeShip(newShip, 24, 25)).toBe(null)
 });
 
-test('ship out of bounds', () => {
+test('x-cord ship out of bounds', () => {
     const newShip = {length: 3};
     const game = new GameBoard();
     
     expect(game.placeShip(newShip, 23, 21)).toBe(null)
 });
+
+test('y-cord ship out of bounds', () => {
+    const newShip = {length: 3};
+    const game = new GameBoard();
+    
+    expect(game.placeShip(newShip, 21, 23)).toBe(null)
+});
+
+//verifyCoordinates
+
+test('does ship exist on coordinates', () => {
+    const newShip = {length: 3};
+    const game = new GameBoard();
+    game.placeShip(newShip, 0, 0);
+
+    expect(game.checkCoordsForShip(1, 0)).toBe(true);
+})
