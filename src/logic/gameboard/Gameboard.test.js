@@ -48,12 +48,34 @@ test('y-cord ship out of bounds', () => {
     expect(game.placeShip(newShip, 21, 23)).toBe(null)
 });
 
-//verifyCoordinates
+//checkCoordsForShip
 
-test('does ship exist on coordinates', () => {
+test('ship exists on coordinates', () => {
     const newShip = {length: 3};
     const game = new GameBoard();
     game.placeShip(newShip, 0, 0);
 
     expect(game.checkCoordsForShip(1, 0)).toBe(true);
-})
+});
+
+test('ship does not exist on coordinates', () => {
+    const newShip = {length: 3};
+    const game = new GameBoard();
+    game.placeShip(newShip, 0, 0);
+
+    expect(game.checkCoordsForShip(1, 1)).toBe(false);
+});
+
+//receiveAttack
+
+test('hit on coords', () => {
+    const game = new GameBoard();
+    game.receiveAttack(0, 0)
+    expect(game.grid[0][0].hit).toBe(true);
+});
+
+test('attack misses', () => {
+    const game = new GameBoard();
+    game.receiveAttack(0, 0)
+    expect(game.grid[0][0].miss).toBe(true);
+});
