@@ -14,9 +14,9 @@ test('test GameBoard initialisation', () => {
 test('check object placement in cell', () => {
     const newShip = {length: 3}
     const game = new GameBoard();
-    game.placeShip(newShip, 0, 0)
-    expect(game.grid[0][0].ship).toBe(newShip);
-    expect(game.grid[1][0].ship).toBe(newShip);
+    game.placeShip(newShip, 2, 0)
+    expect(game.grid[0][0].ship).toBe(null);
+    expect(game.grid[1][0].ship).toBe(null);
     expect(game.grid[2][0].ship).toBe(newShip);
 });
 
@@ -66,6 +66,22 @@ test('ship does not exist on coordinates', () => {
     expect(game.checkCoordsForShip(1, 1)).toBe(false);
 });
 
+//missedAttack
+
+test('cell marked as miss', () => {
+    const game = new GameBoard();
+    game.missedAttack(0, 0);
+
+    expect(game.grid[0][0].miss).toBe(true);
+});
+
+test('hit missed successfully', () => {
+    const game = new GameBoard();
+    game.missedAttack(0, 0)
+
+    expect(game.missedAttack(0, 0)).toBe(true);
+});
+
 //receiveAttack
 
 test('hit on coords', () => {
@@ -74,8 +90,3 @@ test('hit on coords', () => {
     expect(game.grid[0][0].hit).toBe(true);
 });
 
-test('attack misses', () => {
-    const game = new GameBoard();
-    game.receiveAttack(0, 0)
-    expect(game.grid[0][0].miss).toBe(true);
-});
