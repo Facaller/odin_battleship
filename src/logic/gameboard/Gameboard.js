@@ -1,7 +1,8 @@
 export class GameBoard {
     constructor () {
-        this.rows = 24;
-        this.cols = 24;
+        this.rows  = 24;
+        this.cols  = 24;
+        this.fleet = [];
 
         this.grid = Array.from({ length: this.rows }, () => 
             Array.from({ length: this.cols }, () => ({
@@ -12,24 +13,28 @@ export class GameBoard {
         );
     }
 
-    checkCoordsForShip (x, y) {
-        if (this.grid[x][y].ship !== null) {
-            return true
-        } else {
-            return false;
+    checkCoordsForShip (ship, x, y) {
+        if (x >= this.rows || x < 0) return false;
+        if (y >= this.cols || y < 0) return false;
+        if (x + ship.length > this.rows) return false;
+        if (y + ship.length > this.cols) return false;
+        
+        for (let i = 0; i < ship.length; i++) {
+            if (this.grid[x+i][y].ship !== null) return false;
         }
+        return true;
     }
 //do vertical placement later
     placeShip (ship, x, y) {
-        if (x > this.rows || x < 0) return null;
-        if (y > this.cols || y < 0) return null;
-        if (x + ship.length > this.rows) return null;
-        if (y + ship.length > this.cols) return null;
-
+        if (!this.checkCoordsForShip(ship, x, y)) return;
         for (let i = 0; i < ship.length; i++) {
-            if (this.checkCoordsForShip(x+i, y)) return null;
             this.grid[x+i][y].ship = ship;
         }
+        this.extendFleet(ship);
+    }
+
+    extendFleet (ship) {
+        this.fleet.push(ship);
     }
 
     missedAttack (x, y) {
@@ -50,4 +55,6 @@ export class GameBoard {
             this.grid[x][y].ship.isSunk();
         }
     }
+
+
 }
