@@ -13,7 +13,7 @@ export class GameBoard {
         );
     }
 
-    checkCoordsForShip (ship, x, y) {
+    validateCoords (ship, x, y) {
         if (x >= this.rows || x < 0) return false;
         if (y >= this.cols || y < 0) return false;
         if (x + ship.length > this.rows) return false;
@@ -22,11 +22,14 @@ export class GameBoard {
         for (let i = 0; i < ship.length; i++) {
             if (this.grid[x+i][y].ship !== null) return false;
         }
+        for (let i = 0; i < ship.length; i++) {
+            if (this.grid[x][y+i].ship !== null) return false;
+        }
         return true;
     }
 //do vertical placement later
     placeShip (ship, x, y) {
-        if (!this.checkCoordsForShip(ship, x, y)) return;
+        if (!this.validateCoords(ship, x, y)) return;
         for (let i = 0; i < ship.length; i++) {
             this.grid[x+i][y].ship = ship;
         }
@@ -37,24 +40,25 @@ export class GameBoard {
         this.fleet.push(ship);
     }
 
-    missedAttack (x, y) {
-        if (!this.checkCoordsForShip(x, y)) {
-            this.grid[x][y].miss = true;
-            return true;
-        } else {
-            return false
-        }
-    }
-
     receiveAttack (x, y) {
         this.grid[x][y].hit = true;
-        if (this.missedAttack(x, y)) {
-            return;
+        if (this.grid[x][y].ship !== null) {
+            this.missedAttack(x, y)
         } else {
             this.grid[x][y].ship.isHit();
             this.grid[x][y].ship.isSunk();
         }
     }
 
+    missedAttack (x, y) {
+        this.grid[x][y].miss = true;
+    }
 
+    allShipsSunk () {
+        this.fleet.forEach(ship => {
+            ship.sunk === false;
+            return false;
+        });
+        return true;
+    }
 }
