@@ -63,10 +63,7 @@ export class GameBoard {
     }
 
     allShipsSunk () {
-        this.fleet.forEach(ship => {
-            ship.sunk === false;
-            return false;
-        });
+        if (this.fleet.some(ship => ship.sunk === false)) return false;
         return true;
     }
 }

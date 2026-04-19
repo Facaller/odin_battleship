@@ -112,3 +112,26 @@ test('fleet contains true reference', () => {
 
 //allShipsSunk
 
+test('all ships sunk', () => {
+    const newShip = {length: 3};
+    const newShip2 = {length: 2};
+    const game = new GameBoard();
+    game.extendFleet(newShip);
+    game.extendFleet(newShip2);
+    newShip.sunk = true;
+    newShip2.sunk = true;
+
+    expect(game.allShipsSunk()).toBe(true);
+});
+
+test('all ships not sunk', () => {
+    const newShip = {length: 3};
+    const newShip2 = {length: 2};
+    const game = new GameBoard();
+    game.extendFleet(newShip);
+    game.extendFleet(newShip2);
+    newShip.sunk = true;
+    newShip2.sunk = false;
+
+    expect(game.allShipsSunk()).toBe(false);
+});

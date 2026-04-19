@@ -21,6 +21,12 @@ test('is ship sunk', () => {
     expect(instance.isSunk()).toBe(false);
 });
 
+test('ship has sunk', () => {
+    const instance = new Ship(3, 2);
+    instance.isHit();
+    expect(instance.isSunk()).toBe(true);
+});
+
 test('ship is hit', () => {
     const instance = new Ship(3);
     expect(instance.isHit()).toBe(1);
