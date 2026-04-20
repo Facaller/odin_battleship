@@ -1,3 +1,5 @@
+import { Ship } from "../ship/Ship.js";
+
 export class GameBoard {
     constructor () {
         this.rows  = 24;
@@ -31,6 +33,11 @@ export class GameBoard {
         }
         return true;
     }
+
+    createShip (hp) {
+        return new Ship(hp);
+    }
+
 //do vertical placement later
     placeShip (ship, x, y) {
         if (!this.validateCoords(x, y)) return;
