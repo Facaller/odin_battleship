@@ -4,6 +4,11 @@ export class Player {
     constructor () {
         this.board = new GameBoard();
     }
+
+    initialiseShip (hp, x, y) {
+        const newShip = this.board.createShip(hp);
+        this.board.placeShip(newShip, x, y);
+    }
 }
 
 // Mental model to lock in
