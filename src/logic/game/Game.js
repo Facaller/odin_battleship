@@ -2,8 +2,16 @@ import { Player } from "../player/Player.js";
 
 class Controller {
     constructor () {
+        this.player1 = new Player();
+        this.player2 = new Player();
 
+        this.gameState = {
+            status: "strategy",
+            turn:   this.player1
+        }
     }
+
+
 }
 
 
