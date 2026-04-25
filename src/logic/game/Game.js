@@ -12,20 +12,24 @@ class Controller {
     }
 
     changeGameState (status) {
-        this.gameState.status = status;
+        return this.gameState.status = status;
     }
 
     changeTurn (turn) {
-        this.gameState.turn = turn;
+        return this.gameState.turn = turn;
     }
 
-    trackTurns () {
+    playTurn () {
         if (this.gameState.turn === this.player1) {
             this.player1.attack(this.player2.board, x, y);
+            this.changeTurn(this.player2);
         } else {
             this.player2.attack(this.player1.board, x, y);
+            this.changeTurn(this.player1);
         }
     }
+
+
 }
 
 
