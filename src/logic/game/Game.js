@@ -29,6 +29,12 @@ class Controller {
         }
     }
 
+    checkWinCondition () {
+        if (this.player1.board.allShipsSunk() || this.player2.board.allShipsSunk()) {
+            this.changeGameState("finish");
+            
+        }
+    }
 
 }
 
