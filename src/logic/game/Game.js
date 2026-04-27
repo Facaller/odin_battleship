@@ -19,7 +19,7 @@ class Controller {
         return this.gameState.turn = turn;
     }
 
-    playTurn () {
+    playTurn (x, y) {
         if (this.gameState.turn === this.player1) {
             this.player1.attack(this.player2.board, x, y);
             this.changeTurn(this.player2);
