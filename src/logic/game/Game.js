@@ -7,7 +7,8 @@ class Controller {
 
         this.gameState = {
             status: "strategy",
-            turn:   this.player1
+            turn:   this.player1,
+            winner: "undecided"
         }
     }
 
@@ -17,6 +18,14 @@ class Controller {
 
     changeTurn (turn) {
         return this.gameState.turn = turn;
+    }
+
+    assignWinner (winner) {
+        return this.gameState.winner = winner;
+    }
+
+    setShip (x, y) {
+        
     }
 
     playTurn (x, y) {
@@ -30,9 +39,13 @@ class Controller {
     }
 
     checkWinCondition () {
-        if (this.player1.board.allShipsSunk() || this.player2.board.allShipsSunk()) {
+        if (this.player1.board.allShipsSunk()) {
             this.changeGameState("finish");
-            
+            this.assignWinner("Player2");
+        }
+        if (this.player2.board.allShipsSunk()) {
+            this.changeGameState("finish");
+            this.assignWinner("Player1");
         }
     }
 
