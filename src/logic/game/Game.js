@@ -12,7 +12,7 @@ class Controller {
         }
     }
 
-    changeGameState (status) {
+    changeStatus (status) {
         return this.gameState.status = status;
     }
 
@@ -24,11 +24,28 @@ class Controller {
         return this.gameState.winner = winner;
     }
 
-    setShip (x, y) {
-        
+    beginPlaying () {
+        if (this.player1.board.fleet.length === 5
+            || this.player2.board.fleet.length === 5) {
+                this.changeStatus("playing");
+        }
+    }
+//find place to switch turns for placing ship
+    setShip (hp, x, y) {
+        if (this.gameState.status !== "strategy") return;
+
+        if (this.gameState.turn === this.player1) {
+            this.player1.initialiseShip(hp, x, y);
+        } else {
+            this.player2.initialiseShip(hp, x, y);
+        }
+
+        this.beginPlaying();
     }
 
     playTurn (x, y) {
+        if (this.gameState.status !== "playing") return;
+
         if (this.gameState.turn === this.player1) {
             this.player1.attack(this.player2.board, x, y);
             this.changeTurn(this.player2);
@@ -40,11 +57,11 @@ class Controller {
 
     checkWinCondition () {
         if (this.player1.board.allShipsSunk()) {
-            this.changeGameState("finish");
+            this.changeStatus("finish");
             this.assignWinner("Player2");
         }
         if (this.player2.board.allShipsSunk()) {
-            this.changeGameState("finish");
+            this.changeStatus("finish");
             this.assignWinner("Player1");
         }
     }
