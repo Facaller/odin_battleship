@@ -36,10 +36,7 @@ class Controller {
 
         if (this.gameState.turn === this.player1) {
             this.player1.initialiseShip(hp, x, y);
-        } else {
-            this.player2.initialiseShip(hp, x, y);
         }
-
         this.beginPlaying();
     }
 
