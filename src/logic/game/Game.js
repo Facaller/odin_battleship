@@ -30,14 +30,13 @@ class Controller {
                 this.changeStatus("playing");
         }
     }
-//find place to switch turns for placing ship
+
     setShip (hp, x, y) {
         if (this.gameState.status !== "strategy") return;
 
         if (this.gameState.turn === this.player1) {
             this.player1.initialiseShip(hp, x, y);
         }
-        this.beginPlaying();
     }
 
     playTurn (x, y) {
