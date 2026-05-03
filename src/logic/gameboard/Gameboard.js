@@ -54,6 +54,7 @@ export class GameBoard {
     }
 
     receiveAttack (x, y) {
+        if (this.grid[x][y].hit === true) return;
         if (!this.validateCoords(x, y)) return;
         this.grid[x][y].hit = true;
 
