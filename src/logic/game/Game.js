@@ -1,9 +1,11 @@
 import { Player } from "../player/Player.js";
+import { Computer } from "../computer/computer.js";
 
 class Controller {
     constructor () {
-        this.player1 = new Player();
-        this.player2 = new Player();
+        this.player1  = new Player();
+        this.player2  = new Player();
+        this.computer = new Computer();
 
         this.gameState = {
             status: "strategy",
