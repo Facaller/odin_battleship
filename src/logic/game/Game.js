@@ -7,6 +7,8 @@ class Controller {
         this.player2  = new Player();
         this.computer = new Computer();
 
+        this.playAI   = false;
+
         this.gameState = {
             status: "strategy",
             turn:   this.player1,
@@ -51,6 +53,12 @@ class Controller {
             this.player2.attack(this.player1.board, x, y);
             this.changeTurn(this.player1);
         }
+    }
+
+    playTurnAI () {
+        if (!this.playAI) return;
+
+        return this.computer.takeRandomMove();
     }
 
     checkWinCondition () {
