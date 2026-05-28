@@ -1,17 +1,16 @@
 import { Player } from "../player/Player.js";
 import { Computer } from "../computer/computer.js";
-
+//get random coords for ship placement
 class Controller {
     constructor () {
         this.player1  = new Player();
         this.player2  = new Player();
         this.computer = new Computer();
 
-        this.playAI   = false;
-
         this.gameState = {
             status: "strategy",
             turn:   this.player1,
+            playAi: false,
             winner: "undecided"
         }
     }
@@ -50,14 +49,17 @@ class Controller {
             this.player1.attack(this.player2.board, x, y);
             this.changeTurn(this.player2);
         } else {
+            if (this.gameState.playAi === true) {
+                const [r, c] = this.playTurnAi();
+                this.player2.attack(this.player1.board, r, c);
+                this.changeTurn(this.player1);
+            }
             this.player2.attack(this.player1.board, x, y);
             this.changeTurn(this.player1);
         }
     }
 
-    playTurnAI () {
-        if (!this.playAI) return;
-
+    playTurnAi () {
         return this.computer.takeRandomMove();
     }
 
