@@ -48,6 +48,12 @@ export class GameBoard {
         }
         this.extendFleet(ship);
     }
+//might not need x and y
+    placeShipRandomly (ship, x, y) {
+        const randomRow = Math.floor(Math.random() * this.grid.length);
+        const randomCol = Math.floor(Math.random() * randomRow.length);
+
+    }
 
     extendFleet (ship) {
         this.fleet.push(ship);
