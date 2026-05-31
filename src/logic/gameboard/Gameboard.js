@@ -55,11 +55,14 @@ export class GameBoard {
 // Now you have:
 // the coordinates (rowIndex, colIndex)
 // and you can access the object stored there if needed.
-    placeShipRandomly (ship, x, y) {
-        const randomRow = Math.floor(Math.random() * this.grid.length);
-        const rowIndex = this.grid[randomRow]
-        const randomCol = Math.floor(Math.random() * rowIndex.length);
+    placeShipRandomly (ship) {
+        while (this.fleet.length < 6) {
+            const randomRowIndex = Math.floor(Math.random() * this.grid.length);
+            const randomRow      = this.grid[randomRowIndex];
+            const randomColIndex = Math.floor(Math.random() * randomRow.length);
 
+            this.placeShip(ship, randomRowIndex, randomColIndex);
+        }
     }
 
     extendFleet (ship) {
