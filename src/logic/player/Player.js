@@ -10,6 +10,11 @@ export class Player {
         this.board.placeShip(newShip, x, y);
     }
 
+    initialiseFleet () {
+        const newShip = this.board.createShip(hp);
+        this.board.placeShipRandomly(newShip);
+    }
+
     attack (enemyBoard, x, y) {
         enemyBoard.receiveAttack(x, y);
     }

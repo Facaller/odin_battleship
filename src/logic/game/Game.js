@@ -39,7 +39,15 @@ class Controller {
 
         if (this.gameState.turn === this.player1) {
             this.player1.initialiseShip(hp, x, y);
+        } else {
+            this.player2.initialiseShip(hp, x, y);
         }
+    }
+// Should work exactly the same as setSHip
+// Should initialise fleet in Player and use that method here
+    setFleet () {
+        if (this.gameState.status !== "strategy") return;
+
     }
 
     playTurn (x, y) {

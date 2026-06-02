@@ -40,38 +40,37 @@ export class GameBoard {
 
 //do vertical placement later
     placeShip (ship, x, y) {
-        if (!this.validateCoords(x, y)) return;
-        if (!this.validateShipCoords(ship, x, y)) return;
+        if (!this.validateCoords(x, y)) return false;
+        if (!this.validateShipCoords(ship, x, y)) return false;
 
         for (let i = 0; i < ship.length; i++) {
             this.grid[x+i][y].ship = ship;
         }
         this.extendFleet(ship);
     }
-//might not need x and y
-// Generate a random row index.
-// Use that index to get the row array.
-// Use that row array's length to generate a random column index.
-// Now you have:
-// the coordinates (rowIndex, colIndex)
-// and you can access the object stored there if needed.
+//consider making method to get random coords
+//
     placeShipRandomly (ship) {
-        while (this.fleet.length < 6) {
             const randomRowIndex = Math.floor(Math.random() * this.grid.length);
             const randomRow      = this.grid[randomRowIndex];
             const randomColIndex = Math.floor(Math.random() * randomRow.length);
 
             this.placeShip(ship, randomRowIndex, randomColIndex);
-        }
     }
 
     extendFleet (ship) {
         this.fleet.push(ship);
     }
 
+    extendFleetRandomly () {
+        while (this.fleet.length < 7) {
+
+        }
+    }
+
     receiveAttack (x, y) {
-        if (this.grid[x][y].hit === true) return;
         if (!this.validateCoords(x, y)) return;
+        if (this.grid[x][y].hit === true) return;
         this.grid[x][y].hit = true;
 
         if (this.grid[x][y].ship === null) {
