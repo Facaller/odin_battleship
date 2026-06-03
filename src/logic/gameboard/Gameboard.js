@@ -34,6 +34,14 @@ export class GameBoard {
         return true;
     }
 
+    createRandomCoords () {
+        const randomRowIndex = Math.floor(Math.random() * this.grid.length);
+        const randomRow      = this.grid[randomRowIndex];
+        const randomColIndex = Math.floor(Math.random() * randomRow.length);
+
+        return [randomRowIndex, randomColIndex];
+    }
+
     createShip (hp) {
         return new Ship(hp);
     }
@@ -47,15 +55,16 @@ export class GameBoard {
             this.grid[x+i][y].ship = ship;
         }
         this.extendFleet(ship);
+        return true;
     }
-//consider making method to get random coords
-//
-    placeShipRandomly (ship) {
-            const randomRowIndex = Math.floor(Math.random() * this.grid.length);
-            const randomRow      = this.grid[randomRowIndex];
-            const randomColIndex = Math.floor(Math.random() * randomRow.length);
 
-            this.placeShip(ship, randomRowIndex, randomColIndex);
+    placeShipRandomly (ship) {
+        let success = false;
+        
+        while (!success) {
+            const [x, y] = this.createRandomCoords();
+            success = this.placeShip(ship, x, y);
+        }
     }
 
     extendFleet (ship) {
