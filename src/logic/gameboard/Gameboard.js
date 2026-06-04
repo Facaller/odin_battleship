@@ -2,9 +2,10 @@ import { Ship } from "../ship/Ship.js";
 
 export class GameBoard {
     constructor () {
-        this.rows  = 24;
-        this.cols  = 24;
-        this.fleet = [];
+        this.rows   = 24;
+        this.cols   = 24;
+        this.fleet  = [];
+        this.shipHp = [5, 4, 4, 3, 3, 2, 2];
 
         this.grid = Array.from({ length: this.rows }, () => 
             Array.from({ length: this.cols }, () => ({
@@ -71,9 +72,12 @@ export class GameBoard {
         this.fleet.push(ship);
     }
 
-    extendFleetRandomly () {
+    fillFleet () {
         while (this.fleet.length < 7) {
-
+            this.shipHp.forEach(hp => {
+                const newShip = this.createShip(hp);
+                this.placeShipRandomly(newShip);
+            });
         }
     }
 
