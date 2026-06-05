@@ -5,7 +5,8 @@ export class GameBoard {
         this.rows   = 24;
         this.cols   = 24;
         this.fleet  = [];
-        this.shipHp = [5, 4, 4, 3, 3, 2, 2];
+        this.shipHp = [7, 5, 5, 4, 4, 3, 2];
+        this.orientation = 'horizontal';
 
         this.grid = Array.from({ length: this.rows }, () => 
             Array.from({ length: this.cols }, () => ({
@@ -43,18 +44,28 @@ export class GameBoard {
         return [randomRowIndex, randomColIndex];
     }
 
+    setOrientation (direction) {
+        this.orientation = direction;
+    }
+
     createShip (hp) {
         return new Ship(hp);
     }
 
-//do vertical placement later
     placeShip (ship, x, y) {
         if (!this.validateCoords(x, y)) return false;
         if (!this.validateShipCoords(ship, x, y)) return false;
 
-        for (let i = 0; i < ship.length; i++) {
-            this.grid[x+i][y].ship = ship;
+        if (this.orientation === 'horizontal') {
+            for (let i = 0; i < ship.length; i++) {
+                this.grid[x+i][y].ship = ship;
+            }
+        } else {
+            for (let i = 0; i < ship.length; i++) {
+                this.grid[x][y+i].ship = ship;
+            }
         }
+
         this.extendFleet(ship);
         return true;
     }
@@ -104,55 +115,99 @@ export class GameBoard {
     }
 }
 
-// Your grid is an array of arrays of objects:
+// How ship placement usually works (no drag-and-drop)
 
-// this.grid → outer array (rows)
-// Each row → inner array (columns)
-// Each column entry → an object containing hit, miss, and ship
+// You separate the system into two layers:
 
-// Conceptually, it looks like:
+// 1. Game logic layer (your Gameboard)
 
-// [
-//   [object, object, object],
-//   [object, object, object],
-//   [object, object, object]
-// ]
+// This layer only cares about:
 
-// So when you generate a random row index, you're selecting which inner array (row) to use.
+// ship length
+// starting coordinates
+// orientation
+// validity checks
+// updating the grid
 
-// When you generate a random column index, you're selecting which object within that row to use.
+// It does not care how the user picked the spot.
 
-// For example, if:
+// So your placement function conceptually only needs:
 
-// randomRow = 2
-// randomCol = 1
+// “Place a ship at (x, y) going horizontal or vertical.”
 
-// then:
+// That’s it.
 
-// (2, 1) are the coordinates
-// the object stored at those coordinates is:
-// {
-//   hit: false,
-//   miss: false,
-//   ship: null
-// }
+// 2. UI layer (your clicks or controls)
 
-// One thing to notice in your original code is that randomRow is just a number. If you want to know how many columns are available, you need to look at the row array itself, not the row index.
+// This layer decides:
 
-// A good way to reason through it is:
+// where the user clicked
+// what ship is currently selected
+// what orientation is active
 
-// Generate a random row index.
-// Use that index to get the row array.
-// Use that row array's length to generate a random column index.
-// Now you have:
-// the coordinates (rowIndex, colIndex)
-// and you can access the object stored there if needed.
+// Then it calls:
 
-// For future reference:
+// “Gameboard, place this ship here.”
 
-// Coordinates = row index + column index.
-// Object = the value stored at those coordinates.
-// Row = an entire inner array.
-// Grid = the entire 2D structure.
+// So what does the flow look like?
+// Example manual placement (click-based)
+// User selects a ship (e.g. “Destroyer”)
+// User clicks a cell on the grid (say (3, 5))
+// User has orientation set (horizontal/vertical)
+// UI calls Gameboard:
 
-// A quick check for your understanding: if randomRow happened to be 4, what do you think this.grid[4] would return—an object, a coordinate, or something else?
+// place ship of length 3 at (3, 5), horizontal
+
+// Important insight
+
+// You do NOT need:
+
+// dragging
+// Ship objects being moved around visually
+// Ship objects existing before placement (necessarily)
+
+// You only need:
+
+// coordinates + orientation + ship length
+
+// That’s enough to fully define placement in Battleship.
+
+// Where your current shipHp fits perfectly
+
+// Your array:
+
+// [7, 5, 5, 4, 4, 3, 2]
+
+// already defines your fleet.
+
+// So placement becomes:
+
+// Take next ship length
+// Ask Gameboard to place it
+// Gameboard creates ship internally
+// Gameboard fills grid
+
+// That’s a complete system without any drag-and-drop complexity.
+
+// What drag-and-drop would change (later)
+
+// If you did implement drag-and-drop, the only thing that changes is:
+
+// Instead of clicking a cell
+// You drag a ship element onto a cell
+
+// But the final call is identical:
+
+// “Place ship at (x, y), orientation”
+
+// So your Gameboard logic would not change much at all.
+
+// The key takeaway
+
+// You are overthinking the UI right now (very common at this stage).
+
+// Your Gameboard should only care about this contract:
+
+// “Given a length, position, and orientation, place a ship if valid.”
+
+// Everything else—dragging, clicking, random placement—is just different ways of producing those inputs.
