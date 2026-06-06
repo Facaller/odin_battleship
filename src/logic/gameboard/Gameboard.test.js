@@ -70,6 +70,20 @@ test('ship does not exist on coordinates', () => {
     expect(game.validateShipCoords(newShip, 4, 0)).toBe(true);
 });
 
+//random coordinates generator
+
+test('returns an array; array has two values', () => {
+    const game = new GameBoard();
+
+    expect(game.createRandomCoords()).toEqual(expect.any(Array));
+    expect(game.createRandomCoords()).toHaveLength(2);
+
+    // result.forEach(item => {
+    //     expect(item).toBeGreaterThanOrEqual(0);
+    //     expect(item).toBeLessThanOrEqual(9);
+    //   });
+});
+
 //receiveAttack
 
 test('coords register hit', () => {
