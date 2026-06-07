@@ -11,7 +11,7 @@ test('test GameBoard initialisation', () => {
 
 //placeShip
 
-test('check object placement in cell', () => {
+test('ship placed along x axis', () => {
     const newShip = {length: 3}
     const game = new GameBoard();
     game.placeShip(newShip, 2, 0)
@@ -20,6 +20,27 @@ test('check object placement in cell', () => {
     expect(game.grid[3][0].ship).toBe(newShip);
     expect(game.grid[4][0].ship).toBe(newShip);
     expect(game.grid[5][0].ship).toBe(null);
+});
+
+test('ship placed along y axis', () => {
+    const newShip = {length: 3}
+    const game = new GameBoard();
+    game.orientation = 'vertical';
+    game.placeShip(newShip, 2, 4)
+    expect(game.grid[2][3].ship).toBe(null);
+    expect(game.grid[2][4].ship).toBe(newShip);
+    expect(game.grid[2][5].ship).toBe(newShip);
+    expect(game.grid[2][6].ship).toBe(newShip);
+    expect(game.grid[2][7].ship).toBe(null);
+});
+
+//fillFleet
+
+test('fleet is filled by random placement', () => {
+    const game = new GameBoard();
+    game.fillFleet();
+
+    expect(game.fleet.length).toEqual(7);
 });
 
 //validateCoords
@@ -83,6 +104,16 @@ test('returns an array; array has two values', () => {
     //     expect(item).toBeLessThanOrEqual(9);
     //   });
 });
+
+test('items are within grid size', () => {
+    const game = new GameBoard();
+    const randomArray = game.createRandomCoords();
+
+    expect(randomArray.forEach(item => {
+        expect(item).toBeGreaterThanOrEqual(0);
+        expect(item).toBeLessThanOrEqual(game.grid.length);
+    }))
+})
 
 //receiveAttack
 

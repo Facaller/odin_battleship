@@ -11,7 +11,6 @@ export class Player {
     }
 
     initialiseFleet () {
-        const newShip = this.board.createShip(hp);
         this.board.placeShipRandomly(newShip);
     }
 
