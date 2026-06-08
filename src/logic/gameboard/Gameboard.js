@@ -47,7 +47,7 @@ export class GameBoard {
     setOrientation (direction) {
         this.orientation = direction;
     }
-
+//use ship hp perhaps to cycle through creation
     createShip (hp) {
         return new Ship(hp);
     }
