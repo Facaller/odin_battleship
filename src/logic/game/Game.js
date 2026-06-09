@@ -28,10 +28,7 @@ class Controller {
     }
 
     beginPlaying () {
-        if (this.player1.board.fleet.length === 5
-            || this.player2.board.fleet.length === 5) {
-                this.changeStatus("playing");
-        }
+        this.changeStatus("playing");
     }
 
     setShip (hp, x, y) {
