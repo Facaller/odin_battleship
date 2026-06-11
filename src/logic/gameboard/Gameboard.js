@@ -2,10 +2,11 @@ import { Ship } from "../ship/Ship.js";
 
 export class GameBoard {
     constructor () {
-        this.rows   = 24;
-        this.cols   = 24;
-        this.fleet  = [];
-        this.shipHp = [7, 5, 5, 4, 4, 3, 2];
+        this.rows     = 24;
+        this.cols     = 24;
+        this.fleet    = [];
+        this.barracks = [];
+        this.shipHp   = [7, 5, 5, 4, 4, 3, 2];
         this.orientation = 'horizontal';
 
         this.grid = Array.from({ length: this.rows }, () => 
@@ -51,7 +52,7 @@ export class GameBoard {
     createShip (hp) {
         return new Ship(hp);
     }
-
+//needs to consume from barracks.
     placeShip (ship, x, y) {
         if (!this.validateCoords(x, y)) return false;
         if (!this.validateShipCoords(ship, x, y)) return false;
@@ -79,8 +80,19 @@ export class GameBoard {
         }
     }
 
+    extendBarracks (ship) {
+        this.barracks.push(ship);
+    }
+// extend fleet needs to take from barracks
     extendFleet (ship) {
         this.fleet.push(ship);
+    }
+
+    initialiseBarracks () {
+        this.shipHp.forEach(hp => {
+            const newShip = this.createShip(hp);
+            this.extendBarracks(newShip);
+        });
     }
 
     fillFleet () {
@@ -114,6 +126,14 @@ export class GameBoard {
         return true;
     }
 }
+
+// With a barracks approach:
+
+// Game starts.
+// All ships are created once.
+// Ships are stored in barracks.
+// Placement methods consume ships from barracks.
+// Successfully placed ships move to fleet.
 
 // Model 2: Fleet exists first, placement happens second
 
