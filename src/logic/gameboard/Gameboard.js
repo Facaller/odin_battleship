@@ -48,11 +48,13 @@ export class GameBoard {
     setOrientation (direction) {
         this.orientation = direction;
     }
-//use ship hp perhaps to cycle through creation
+
     createShip (hp) {
         return new Ship(hp);
     }
-//needs to consume from barracks.
+//needs to consume from barracks. look at parameter, 
+//may be unneeded somewhere in chain
+//the ship object / parameter is an issue somehow
     placeShip (ship, x, y) {
         if (!this.validateCoords(x, y)) return false;
         if (!this.validateShipCoords(ship, x, y)) return false;
@@ -67,7 +69,7 @@ export class GameBoard {
             }
         }
 
-        this.extendFleet(ship);
+        this.deployShip();
         return true;
     }
 
@@ -83,9 +85,10 @@ export class GameBoard {
     extendBarracks (ship) {
         this.barracks.push(ship);
     }
-// extend fleet needs to take from barracks
-    extendFleet (ship) {
-        this.fleet.push(ship);
+
+    deployShip () {
+        const deployedShip = this.barracks.splice(0, 1);
+        this.fleet.push(deployedShip);
     }
 
     initialiseBarracks () {
@@ -95,12 +98,13 @@ export class GameBoard {
         });
     }
 
-    fillFleet () {
-        while (this.fleet.length < 7) {
-            this.shipHp.forEach(hp => {
-                const newShip = this.createShip(hp);
-                this.placeShipRandomly(newShip);
-            });
+    deployFleet () {
+        while (this.barracks.length > 0) {
+            this.placeShipRandomly();
+            // this.shipHp.forEach(hp => {
+            //     const newShip = this.createShip(hp);
+            //     this.placeShipRandomly(newShip);
+            // });
         }
     }
 
