@@ -54,7 +54,7 @@ export class GameBoard {
     }
 //needs to consume from barracks. look at parameter, 
 //may be unneeded somewhere in chain
-//the ship object / parameter is an issue somehow
+//the ship object / parameter is an issue somehow. Yes param should be removed
     placeShip (ship, x, y) {
         if (!this.validateCoords(x, y)) return false;
         if (!this.validateShipCoords(ship, x, y)) return false;
