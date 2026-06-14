@@ -12,33 +12,33 @@ test('test GameBoard initialisation', () => {
 //placeShip
 
 test('ship placed along x axis', () => {
-    const newShip = {length: 3}
     const game = new GameBoard();
-    game.placeShip(newShip, 2, 0)
+    const newShip = game.barracks[0];
+    game.placeShip(2, 0)
     expect(game.grid[1][0].ship).toBe(null);
     expect(game.grid[2][0].ship).toBe(newShip);
     expect(game.grid[3][0].ship).toBe(newShip);
     expect(game.grid[4][0].ship).toBe(newShip);
-    expect(game.grid[5][0].ship).toBe(null);
+    expect(game.grid[9][0].ship).toBe(null);
 });
 
 test('ship placed along y axis', () => {
-    const newShip = {length: 3}
     const game = new GameBoard();
+    const newShip = game.barracks[0];
     game.orientation = 'vertical';
-    game.placeShip(newShip, 2, 4)
+    game.placeShip(2, 4)
     expect(game.grid[2][3].ship).toBe(null);
     expect(game.grid[2][4].ship).toBe(newShip);
     expect(game.grid[2][5].ship).toBe(newShip);
     expect(game.grid[2][6].ship).toBe(newShip);
-    expect(game.grid[2][7].ship).toBe(null);
+    expect(game.grid[2][12].ship).toBe(null);
 });
 
 //fillFleet
 
 test('fleet is filled by random placement', () => {
     const game = new GameBoard();
-    game.fillFleet();
+    game.deployFleet();
 
     expect(game.fleet.length).toEqual(7);
 });
@@ -136,12 +136,12 @@ test('cell marked as miss', () => {
     expect(game.grid[0][0].miss).toBe(true);
 });
 
-//extendFleet
+//deployShip
 
-test('extends fleet', () => {
-    const newShip = {length: 3};
+test('deploys ship', () => {
     const game = new GameBoard();
-    game.extendFleet(newShip);
+    const newShip = game.barracks[0];
+    game.deployShip();
 
     expect(game.fleet).toContain(newShip)
 });
