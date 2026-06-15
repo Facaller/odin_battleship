@@ -13,6 +13,7 @@ test('test GameBoard initialisation', () => {
 
 test('ship placed along x axis', () => {
     const game = new GameBoard();
+    game.initialiseBarracks();
     const newShip = game.barracks[0];
     game.placeShip(2, 0)
     expect(game.grid[1][0].ship).toBe(null);
@@ -24,6 +25,7 @@ test('ship placed along x axis', () => {
 
 test('ship placed along y axis', () => {
     const game = new GameBoard();
+    game.initialiseBarracks();
     const newShip = game.barracks[0];
     game.orientation = 'vertical';
     game.placeShip(2, 4)
@@ -38,6 +40,7 @@ test('ship placed along y axis', () => {
 
 test('fleet is filled by random placement', () => {
     const game = new GameBoard();
+    game.initialiseBarracks();
     game.deployFleet();
 
     expect(game.fleet.length).toEqual(7);
@@ -140,17 +143,19 @@ test('cell marked as miss', () => {
 
 test('deploys ship', () => {
     const game = new GameBoard();
+    game.initialiseBarracks();
     const newShip = game.barracks[0];
     game.deployShip();
 
-    expect(game.fleet).toContain(newShip)
+    expect(game.fleet[0]).toContain(newShip)
 });
 
 test('fleet contains true reference', () => {
-    const newShip = {length: 3};
-    newShip.hit = true;
     const game = new GameBoard();
-    game.extendFleet(newShip);
+    game.initialiseBarracks();
+    const newShip = game.barracks[0];
+    game.placeShip(1, 4);
+    newShip.hit = true;
 
     expect(game.fleet[0].hit).toBe(true)
 });
