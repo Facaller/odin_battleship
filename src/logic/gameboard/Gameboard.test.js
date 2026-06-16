@@ -9,6 +9,14 @@ test('test GameBoard initialisation', () => {
     });
 });
 
+//createShip
+
+test('creates Ship', () => {
+    const game = new GameBoard();
+    const ship = game.createShip(3);
+    expect(ship).toEqual(expect.any(Object));
+});
+
 //placeShip
 
 test('ship placed along x axis', () => {
@@ -155,9 +163,9 @@ test('fleet contains true reference', () => {
     game.initialiseBarracks();
     const newShip = game.barracks[0];
     game.placeShip(1, 4);
-    newShip.hit = true;
+    game.receiveAttack(1, 4);
 
-    expect(game.fleet[0].hit).toBe(true)
+    expect(game.fleet[0]).toEqual(1);
 });
 
 //allShipsSunk
@@ -185,3 +193,68 @@ test('all ships not sunk', () => {
 
     expect(game.allShipsSunk()).toBe(false);
 });
+
+// That output is very revealing:
+
+// Received: [{"hit": 1, "length": 7, "sunk": false}]
+
+// Notice the outer square brackets:
+
+// [{"hit": 1, "length": 7, "sunk": false}]
+//  ^
+
+// That means game.fleet[0] is an array containing a Ship, not the Ship itself.
+
+// So your structure is probably something like:
+
+// game.fleet = [
+//     [Ship { hit: 1, length: 7, sunk: false }]
+// ]
+
+// rather than:
+
+// game.fleet = [
+//     Ship { hit: 1, length: 7, sunk: false }
+// ]
+
+// Therefore:
+
+// game.fleet[0].hit
+
+// is actually:
+
+// [].hit
+
+// which is undefined.
+
+// You likely need:
+
+// expect(game.fleet[0][0].hit).toEqual(1);
+
+// To confirm, log:
+
+// console.log(game.fleet);
+// console.log(game.fleet[0]);
+// console.log(game.fleet[0][0]);
+
+// I suspect you'll see:
+
+// [
+//   [
+//     Ship {
+//       length: 7,
+//       hit: 1,
+//       sunk: false
+//     }
+//   ]
+// ]
+
+// The next question is why fleet contains arrays. Somewhere in placeShip() you're probably doing something like:
+
+// this.fleet.push([ship]);
+
+// instead of:
+
+// this.fleet.push(ship);
+
+// or perhaps you're filtering/mapping and ending up with nested arrays.
