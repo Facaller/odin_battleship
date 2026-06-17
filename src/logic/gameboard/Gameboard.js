@@ -1,5 +1,5 @@
 import { Ship } from "../ship/Ship.js";
-
+//need method to reset everything for game restart.
 export class GameBoard {
     constructor () {
         this.rows     = 24;
@@ -87,7 +87,7 @@ export class GameBoard {
     }
 
     deployShip () {
-        const deployedShip = this.barracks.splice(0, 1);
+        const deployedShip = this.barracks.shift();
         this.fleet.push(deployedShip);
     }
 

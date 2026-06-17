@@ -155,7 +155,7 @@ test('deploys ship', () => {
     const newShip = game.barracks[0];
     game.deployShip();
 
-    expect(game.fleet[0]).toContain(newShip)
+    expect(game.fleet[0]).toBe(newShip)
 });
 
 test('fleet contains true reference', () => {
@@ -165,96 +165,32 @@ test('fleet contains true reference', () => {
     game.placeShip(1, 4);
     game.receiveAttack(1, 4);
 
-    expect(game.fleet[0]).toEqual(1);
+    expect(game.fleet[0]).toEqual(newShip);
 });
 
 //allShipsSunk
 
 test('all ships sunk', () => {
-    const newShip = {length: 3};
-    const newShip2 = {length: 2};
     const game = new GameBoard();
-    game.extendFleet(newShip);
-    game.extendFleet(newShip2);
-    newShip.sunk = true;
-    newShip2.sunk = true;
+    game.initialiseBarracks();
+    game.deployFleet();
+    
+    game.fleet.forEach(ship => {
+        ship.sunk = true;
+    });
 
     expect(game.allShipsSunk()).toBe(true);
 });
 
 test('all ships not sunk', () => {
-    const newShip = {length: 3};
-    const newShip2 = {length: 2};
     const game = new GameBoard();
-    game.extendFleet(newShip);
-    game.extendFleet(newShip2);
-    newShip.sunk = true;
-    newShip2.sunk = false;
+    game.initialiseBarracks();
+    game.deployFleet();
+    
+    game.fleet.forEach(ship => {
+        ship.sunk = true;
+    });
+    game.fleet[4].sunk = false;
 
     expect(game.allShipsSunk()).toBe(false);
 });
-
-// That output is very revealing:
-
-// Received: [{"hit": 1, "length": 7, "sunk": false}]
-
-// Notice the outer square brackets:
-
-// [{"hit": 1, "length": 7, "sunk": false}]
-//  ^
-
-// That means game.fleet[0] is an array containing a Ship, not the Ship itself.
-
-// So your structure is probably something like:
-
-// game.fleet = [
-//     [Ship { hit: 1, length: 7, sunk: false }]
-// ]
-
-// rather than:
-
-// game.fleet = [
-//     Ship { hit: 1, length: 7, sunk: false }
-// ]
-
-// Therefore:
-
-// game.fleet[0].hit
-
-// is actually:
-
-// [].hit
-
-// which is undefined.
-
-// You likely need:
-
-// expect(game.fleet[0][0].hit).toEqual(1);
-
-// To confirm, log:
-
-// console.log(game.fleet);
-// console.log(game.fleet[0]);
-// console.log(game.fleet[0][0]);
-
-// I suspect you'll see:
-
-// [
-//   [
-//     Ship {
-//       length: 7,
-//       hit: 1,
-//       sunk: false
-//     }
-//   ]
-// ]
-
-// The next question is why fleet contains arrays. Somewhere in placeShip() you're probably doing something like:
-
-// this.fleet.push([ship]);
-
-// instead of:
-
-// this.fleet.push(ship);
-
-// or perhaps you're filtering/mapping and ending up with nested arrays.
