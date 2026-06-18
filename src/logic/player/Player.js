@@ -3,15 +3,19 @@ import { GameBoard } from "../gameboard/Gameboard.js"
 export class Player {
     constructor () {
         this.board = new GameBoard();
+        this.board.initialiseBarracks();
     }
 
-    initialiseShip (hp, x, y) {
-        const newShip = this.board.createShip(hp);
-        this.board.placeShip(newShip, x, y);
+    initialiseShip (x, y) {
+        this.board.placeShip(x, y);
     }
 
     initialiseFleet () {
-        this.board.placeShipRandomly(newShip);
+        this.board.deployFleet();
+    }
+//set ship direction
+    shipDirection (direction) {
+        
     }
 
     attack (enemyBoard, x, y) {

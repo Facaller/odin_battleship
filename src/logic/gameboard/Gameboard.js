@@ -1,5 +1,4 @@
 import { Ship } from "../ship/Ship.js";
-//need method to reset everything for game restart.
 export class GameBoard {
     constructor () {
         this.rows     = 24;
