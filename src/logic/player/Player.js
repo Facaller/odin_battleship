@@ -13,9 +13,10 @@ export class Player {
     initialiseFleet () {
         this.board.deployFleet();
     }
-//set ship direction
-    shipDirection (direction) {
-        
+
+    shipDirection () {
+        const direction = direction === 'horizontal' ? 'vertical' : 'horizontal';
+        this.board.setOrientation(direction);
     }
 
     attack (enemyBoard, x, y) {

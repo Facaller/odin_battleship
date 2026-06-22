@@ -1,6 +1,6 @@
 import { Player } from "../player/Player.js";
 import { Computer } from "../computer/computer.js";
-//get random coords for ship placement
+
 class Controller {
     constructor () {
         this.player1  = new Player();
@@ -16,35 +16,36 @@ class Controller {
     }
 
     changeStatus (status) {
-        return this.gameState.status = status;
+        this.gameState.status = status;
     }
 
     changeTurn (turn) {
-        return this.gameState.turn = turn;
+        this.gameState.turn = turn;
     }
 
     assignWinner (winner) {
-        return this.gameState.winner = winner;
+        this.gameState.winner = winner;
     }
 
     beginPlaying () {
         this.changeStatus("playing");
     }
 
-    setShip (hp, x, y) {
+    setShip (x, y) {
         if (this.gameState.status !== "strategy") return;
 
-        if (this.gameState.turn === this.player1) {
-            this.player1.initialiseShip(hp, x, y);
-        } else {
-            this.player2.initialiseShip(hp, x, y);
-        }
+        this.gameState.turn.initialiseShip(x, y);
     }
-// Should work exactly the same as setSHip
-// Should initialise fleet in Player and use that method here
-    setFleet () {
+
+    createPlayerFleet () {
         if (this.gameState.status !== "strategy") return;
 
+        this.gameState.turn.initialiseFleet();
+
+        if (this.gameState.playAi === true) {
+            this.changeTurn(this.player2);
+            this.gameState.turn.initialiseFleet();
+        }
     }
 
     playTurn (x, y) {
