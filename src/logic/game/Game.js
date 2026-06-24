@@ -59,22 +59,20 @@ class Controller {
     playTurn (x, y) {
         if (this.gameState.status !== "playing") return;
 
-        if (this.gameState.turn === this.player1) {
-            this.player1.attack(this.player2.board, x, y);
-            this.changeTurn(this.player2);
-        } else {
-            if (this.gameState.playAi === true) {
-                const [r, c] = this.playTurnAi();
-                this.player2.attack(this.player1.board, r, c);
-                this.changeTurn(this.player1);
-            }
-            this.player2.attack(this.player1.board, x, y);
-            this.changeTurn(this.player1);
-        }
+        this.gameState.turn.attack(this.getOpponent(), x, y);
+        this.changeTurn(this.getOpponent());
+        this.playAiTurn();
     }
 
-    playTurnAi () {
+    getAiCoords () {
         return this.computer.takeRandomMove();
+    }
+
+    playAiTurn () {
+        if (this.gameState.playAi !== true) return ;
+        
+        const [a, b] = this.getAiCoords();
+        this.gameState.turn.attack(this.getOpponent(), a, b);
     }
 
     checkWinCondition () {
