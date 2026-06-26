@@ -8,10 +8,10 @@ class Controller {
         this.computer = new Computer();
 
         this.gameState = {
-            status: "strategy",
-            turn:   this.player1,
-            playAi: false,
-            winner: "undecided"
+            status:   "strategy",
+            turn:     this.player1,
+            enableAi: false,
+            winner:   null
         }
     }
 
@@ -23,8 +23,8 @@ class Controller {
         this.gameState.turn = turn;
     }
 
-    playAi () {
-        this.gameState.playAi = true;
+    battleAi () {
+        this.gameState.enableAi = true;
     }
 
     assignWinner (winner) {
@@ -50,7 +50,7 @@ class Controller {
 
         this.gameState.turn.initialiseFleet();
 
-        if (this.gameState.playAi === true) {
+        if (this.gameState.enableAi === true) {
             this.changeTurn(this.player2);
             this.gameState.turn.initialiseFleet();
         }
@@ -59,8 +59,13 @@ class Controller {
     playTurn (x, y) {
         if (this.gameState.status !== "playing") return;
 
-        this.gameState.turn.attack(this.getOpponent(), x, y);
-        this.changeTurn(this.getOpponent());
+        const opponent = this.getOpponent(this.gameState.turn);
+
+        this.gameState.turn.attack(opponent, x, y);
+        
+        if (this.checkWinCondition()) return;
+        
+        this.changeTurn(opponent);
         this.playAiTurn();
     }
 
@@ -69,17 +74,25 @@ class Controller {
     }
 
     playAiTurn () {
-        if (this.gameState.playAi !== true) return ;
+        if (this.gameState.enableAi !== true) return ;
         
+        const opponent = this.getOpponent(this.gameState.turn);
         const [a, b] = this.getAiCoords();
-        this.gameState.turn.attack(this.getOpponent(), a, b);
+        
+        this.gameState.turn.attack(opponent, a, b);
+        
+        if (this.checkWinCondition()) return;
+        
+        this.changeTurn(opponent);
     }
 
     checkWinCondition () {
         if (this.gameState.turn.board.allShipsSunk()) {
             this.changeStatus("finish");
-            this.assignWinner(this.getOpponent());
+            this.assignWinner(this.getOpponent(this.gameState.turn));
+            return true;
         }
+        return false;
     }
 
 }
