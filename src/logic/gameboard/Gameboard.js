@@ -103,6 +103,12 @@ export class GameBoard {
         }
     }
 
+    checkFleet () {
+        if (this.barracks.length === 0 && this.fleet.length === 7) return true;
+        
+        return false;
+    }
+
     receiveAttack (x, y) {
         if (!this.validateCoords(x, y)) return;
         if (this.grid[x][y].hit === true) return;

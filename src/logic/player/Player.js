@@ -14,6 +14,12 @@ export class Player {
         this.board.deployFleet();
     }
 
+    isFleetReady () {
+        if (this.board.checkFleet()) return true;
+
+        return false;
+    }
+
     setShipDirection () {
         const direction = direction === 'horizontal' ? 'vertical' : 'horizontal';
         this.board.setOrientation(direction);
