@@ -19,12 +19,15 @@ class Controller {
         this.gameState.status = status;
     }
 
-    changeTurn (turn) {
-        this.gameState.turn = turn;
+    nextTurn () {
+        this.gameState.turn = 
+        this.gameState.turn === this.player1 ? this.player2 : this.player1
     }
 
     battleAi () {
-        this.gameState.enableAi = true;
+        if (this.gameState.status !== "strategy") return;
+
+        this.gameState.enableAi = this.gameState.enableAi === true ? false : true;
     }
 
     assignWinner (winner) {
@@ -40,9 +43,9 @@ class Controller {
     }
 
     startGame () {
-        if (this.gameState.status === "strategy"
-            && this.gameState.turn.isFleetReady()) {
-                this.gameState.status = "playing";
+        if (this.gameState.status === "strategy" && 
+            this.gameState.turn.isFleetReady()) {
+            this.changeStatus("playing");
         }
     }
 
@@ -50,6 +53,7 @@ class Controller {
         if (this.gameState.status !== "strategy") return;
 
         this.gameState.turn.initialiseShip(x, y);
+        this.startGame();
     }
 
     createPlayerFleet () {
@@ -58,9 +62,10 @@ class Controller {
         this.gameState.turn.initialiseFleet();
 
         if (this.gameState.enableAi === true) {
-            this.changeTurn(this.player2);
+            this.nextTurn();
             this.gameState.turn.initialiseFleet();
         }
+        this.startGame();
     }
 
     playTurn (x, y) {
@@ -72,7 +77,7 @@ class Controller {
         
         if (this.checkWinCondition()) return;
         
-        this.changeTurn(opponent);
+        this.this.nextTurn();
         this.playAiTurn();
     }
 
@@ -90,7 +95,7 @@ class Controller {
         
         if (this.checkWinCondition()) return;
         
-        this.changeTurn(opponent);
+        this.nextTurn();
     }
 
     checkWinCondition () {
