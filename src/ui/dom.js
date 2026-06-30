@@ -9,6 +9,8 @@ class Handler {
         this.game = Game;
         this.elements = new Elements();
     }
+
+    
 }
 
 // Your Handler class seems like it's going to be the bridge between your game logic and the UI. That's a good responsibility for it. The important thing is to keep the separation clear:

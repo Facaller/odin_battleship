@@ -1,0 +1,38 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html, body {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    justify-content: space-around;
+}
+
+.header {
+    border: 1px solid black;
+    display: flex;
+    justify-content: center;
+}
+
+.arena {
+    border: 1px solid green;
+    display: flex;
+    justify-content: space-evenly;
+}
+
+.ally-board {
+    border: 1px solid black;
+    padding: 200px;
+}
+
+.foe-board {
+    border: 1px solid black;
+    padding: 200px
+}
+
+/* buttons next */
