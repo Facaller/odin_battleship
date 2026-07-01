@@ -7,20 +7,29 @@
 html, body {
     height: 100%;
     width: 100%;
-    display: flex;
-    flex-direction: column;
     overflow: hidden;
-    justify-content: space-around;
 }
 
 .header {
     border: 1px solid black;
+    height: 20%;
     display: flex;
     justify-content: center;
 }
 
-.arena {
+.game-box {
     border: 1px solid green;
+    height: 80%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+}
+
+.scoreboard {
+    border: 1px solid blue;
+}
+
+.arena {
     display: flex;
     justify-content: space-evenly;
 }

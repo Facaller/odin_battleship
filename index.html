@@ -10,12 +10,21 @@
     <header class="header">
       <h1>Battleship</h1>
     </header>
-    <main class="arena">
-      <div class="ally-board">
-
+    <main class="game-box">
+      <div class="scoreboard">
+        <div class="button-box">
+          <button class="start">Begin battle</button>
+          <button class="reset">Restart</button>
+          <button class="randomize">Random deployment</button>
+          <button class="rotate">Rotate ship</button>
+        </div>
+        <div class="status-box"></div>
       </div>
-      <div class="foe-board">
-
+      <div class="arena">
+        <div class="ally-board">
+        </div>
+        <div class="foe-board">
+        </div>
       </div>
     </main>
     <script type="module" src="/src/main.js"></script>
