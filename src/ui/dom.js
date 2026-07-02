@@ -1,16 +1,39 @@
-class Elements {
+export class Elements {
     constructor () {
+        this.gameBox   = document.querySelector('.game-box');
+        this.allyBoard = document.querySelector('.ally-board');
+        this.foeBoard  = document.querySelector('.foe-board');
+        this.status    = document.querySelector('.status');
 
+        this.startBtn  = document.querySelector('.start-btn');
+        this.resetBtn  = document.querySelector('.reset-btn');
+        this.aiBtn     = document.querySelector('.ai-btn');
+        this.randomBtn = document.querySelector('.randomize-btn');
+        this.rotateBtn = document.querySelector('.rotate-btn');
     }
 }
 
-class Handler {
+export class Handler {
     constructor (Game) {
         this.game = Game;
         this.elements = new Elements();
     }
 
-    
+    checkGameStart () {
+        if (!this.game.startGame()) {
+            
+        }
+    }
+
+    //button events
+    handleStartGame = () => {
+        const start = this.elements.startBtn;
+        start.addEventListener('click', (event) => {
+            event.preventDefault();
+            //helper method that handles start game and the event calls that method
+            this.game.startGame();
+        });
+    }
 }
 
 // Your Handler class seems like it's going to be the bridge between your game logic and the UI. That's a good responsibility for it. The important thing is to keep the separation clear:

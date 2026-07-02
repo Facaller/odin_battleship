@@ -27,6 +27,8 @@ html, body {
 
 .scoreboard {
     border: 1px solid blue;
+    display: flex;
+    flex-direction: column;
 }
 
 .arena {

@@ -1,8 +1,8 @@
 import { Ship } from "../ship/Ship.js";
 export class GameBoard {
     constructor () {
-        this.rows     = 24;
-        this.cols     = 24;
+        this.rows     = 12;
+        this.cols     = 12;
         this.fleet    = [];
         this.barracks = [];
         this.shipHp   = [7, 5, 5, 4, 4, 3, 2];

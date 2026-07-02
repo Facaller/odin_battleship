@@ -43,9 +43,13 @@ class Controller {
     }
 
     startGame () {
+        if (this.gameState.status !== "strategy") return false;
+        if (!this.gameState.turn.isFleetReady()) return false;
+
         if (this.gameState.status === "strategy" && 
             this.gameState.turn.isFleetReady()) {
             this.changeStatus("playing");
+            return true;
         }
     }
 
