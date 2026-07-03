@@ -25,7 +25,7 @@ class Controller {
     }
 
     battleAi () {
-        if (this.gameState.status !== "strategy") return;
+        if (this.gameState.status !== "strategy") return false;
 
         this.gameState.enableAi = this.gameState.enableAi === true ? false : true;
     }

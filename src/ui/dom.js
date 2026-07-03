@@ -19,10 +19,31 @@ export class Handler {
         this.elements = new Elements();
     }
 
+    updateStatus (message) {
+        this.status.textContent = message;
+    }
+
     checkGameStart () {
         if (!this.game.startGame()) {
-            
+            this.updateStatus('Deploy all ships');
+            return;
         }
+        this.game.startGame();
+        this.updateStatus('Prepare for battle!');
+    }
+
+    resetMethod () {
+        //create new Game haha wut
+    }
+
+    aiToggle () {
+        if (!this.game.battleAi()) {
+            this.updateStatus('Battle is already underway')
+            return;
+        }
+
+        this.game.battleAi();
+        this.updateStatus('An artificial mind can be a formidable opponent');
     }
 
     //button events
@@ -30,8 +51,23 @@ export class Handler {
         const start = this.elements.startBtn;
         start.addEventListener('click', (event) => {
             event.preventDefault();
-            //helper method that handles start game and the event calls that method
-            this.game.startGame();
+            this.checkGameStart();
+        });
+    }
+
+    handleReset = () => {
+        const reset = this.elements.resetBtn;
+        reset.addEventListener('click', (event) => {
+            event.preventDefault();
+
+        });
+    }
+
+    handleAiToggle () {
+        const aiBtn = this.elements.aiBtn;
+        aiBtn.addEventListener('click', (event) => {
+            event.preventDefault();
+
         });
     }
 }
