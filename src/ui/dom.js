@@ -23,13 +23,14 @@ export class Handler {
         this.status.textContent = message;
     }
 
-    checkGameStart () {
-        if (!this.game.startGame()) {
+    gameStart () {
+        const gameStart = this.game.startGame();
+        if (!gameStart) {
             this.updateStatus('Deploy all ships');
             return;
+        } else {
+            this.updateStatus('Prepare for battle!');
         }
-        this.game.startGame();
-        this.updateStatus('Prepare for battle!');
     }
 
     resetMethod () {
@@ -46,12 +47,33 @@ export class Handler {
         this.updateStatus('An artificial mind can be a formidable opponent');
     }
 
+    randomDeployment () {
+        const randomDeployment = this.game.createPlayerFleet();
+
+        if (!randomDeployment) {
+            this.updateStatus('The time for strategy has passed');
+            return;
+        } else {
+            this.updateStatus('Fleet deployed');
+        }
+    }
+
+    shipOrientation () {
+        const setOrientation = this.game.setOrientation();
+
+        if (!setOrientation) {
+            this.updateStatus('The time for strategy has passed');
+        } else {
+            this.updateStatus('Strategic placement confirmed');
+        }
+    }
+
     //button events
     handleStartGame = () => {
         const start = this.elements.startBtn;
         start.addEventListener('click', (event) => {
             event.preventDefault();
-            this.checkGameStart();
+            this.gameStart();
         });
     }
 
@@ -68,6 +90,14 @@ export class Handler {
         aiBtn.addEventListener('click', (event) => {
             event.preventDefault();
 
+        });
+    }
+
+    handleRandomDeployment () {
+        const random = this.elements.randomBtn;
+        random.addEventListener('click', (event) => {
+            event.preventDefault();
+            this.randomDeployment();
         });
     }
 }

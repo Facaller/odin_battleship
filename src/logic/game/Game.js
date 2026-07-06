@@ -30,6 +30,13 @@ class Controller {
         this.gameState.enableAi = this.gameState.enableAi === true ? false : true;
     }
 
+    setOrientation () {
+        if (this.gameState.status !== "strategy") return false;
+        
+        this.gameState.turn.setShipDirection();
+        return true;
+    }
+
     assignWinner (winner) {
         this.gameState.winner = winner;
     }
