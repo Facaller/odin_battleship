@@ -61,7 +61,7 @@ class Controller {
     }
 
     setShip (x, y) {
-        if (this.gameState.status !== "strategy") return;
+        if (this.gameState.status !== "strategy") return false;
 
         this.gameState.turn.initialiseShip(x, y);
         this.startGame();

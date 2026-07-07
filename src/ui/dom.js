@@ -23,8 +23,11 @@ export class Handler {
         this.status.textContent = message;
     }
 
+//status methods
+
     gameStart () {
         const gameStart = this.game.startGame();
+
         if (!gameStart) {
             this.updateStatus('Deploy all ships');
             return;
@@ -38,13 +41,14 @@ export class Handler {
     }
 
     aiToggle () {
-        if (!this.game.battleAi()) {
+        const aiToggle = this.game.battleAi();
+
+        if (!aiToggle) {
             this.updateStatus('Battle is already underway')
             return;
+        } else {
+            this.updateStatus('An artificial mind can be a formidable opponent');
         }
-
-        this.game.battleAi();
-        this.updateStatus('An artificial mind can be a formidable opponent');
     }
 
     randomDeployment () {
@@ -68,7 +72,19 @@ export class Handler {
         }
     }
 
-    //button events
+//board methods
+
+    placeShip (x, y) {
+        const setShip = this.game.setShip(x, y);
+
+        if (!setShip) {
+            this.updateStatus('Ship must be placed on valid location inside board');
+        } else {
+            this.updateStatus('Deploy all ships');
+        }
+    }
+
+//button events
     handleStartGame = () => {
         const start = this.elements.startBtn;
         start.addEventListener('click', (event) => {
@@ -85,11 +101,11 @@ export class Handler {
         });
     }
 
-    handleAiToggle () {
+    handleAiToggle = () => {
         const aiBtn = this.elements.aiBtn;
         aiBtn.addEventListener('click', (event) => {
             event.preventDefault();
-
+            this.aiToggle();
         });
     }
 
@@ -98,6 +114,14 @@ export class Handler {
         random.addEventListener('click', (event) => {
             event.preventDefault();
             this.randomDeployment();
+        });
+    }
+
+    handleOrientation = () => {
+        const orientate = this.elements.rotateBtn;
+        orientate.addEventListener('click', (event) => {
+            event.preventDefault();
+            this.shipOrientation();
         });
     }
 }
