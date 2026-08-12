@@ -63,12 +63,15 @@ class Controller {
     setShip (x, y) {
         if (this.gameState.status !== "strategy") return false;
 
-        this.gameState.turn.initialiseShip(x, y);
+        const placed = this.gameState.turn.initialiseShip(x, y);
+        if (!placed) return false;
+        
         this.startGame();
+        return true;
     }
 
     createPlayerFleet () {
-        if (this.gameState.status !== "strategy") return;
+        if (this.gameState.status !== "strategy") return false;
 
         this.gameState.turn.initialiseFleet();
 
@@ -77,6 +80,7 @@ class Controller {
             this.gameState.turn.initialiseFleet();
         }
         this.startGame();
+        return true;
     }
 
     playTurn (x, y) {

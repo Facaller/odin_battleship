@@ -7,7 +7,10 @@ export class Player {
     }
 
     initialiseShip (x, y) {
-        this.board.placeShip(x, y);
+        const placed = this.board.placeShip(x, y);
+
+        if (!placed) return false;
+        return true;
     }
 
     initialiseFleet () {

@@ -23,7 +23,7 @@ export class Handler {
         this.status.textContent = message;
     }
 
-//status methods
+//status & button methods
 
     gameStart () {
         const gameStart = this.game.startGame();
