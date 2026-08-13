@@ -101,6 +101,8 @@ export class GameBoard {
         while (this.barracks.length > 0) {
             this.placeShipRandomly();
         }
+
+        if (this.barracks.length === 0) return true;
     }
 
     checkFleet () {

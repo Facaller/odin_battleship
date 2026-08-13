@@ -84,7 +84,7 @@ class Controller {
     }
 
     playTurn (x, y) {
-        if (this.gameState.status !== "playing") return;
+        if (this.gameState.status !== "playing") return false;
 
         const opponent = this.getOpponent(this.gameState.turn);
 

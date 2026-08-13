@@ -14,7 +14,10 @@ export class Player {
     }
 
     initialiseFleet () {
-        this.board.deployFleet();
+        const placed = this.board.deployFleet();
+        
+        if (!placed) return false;
+        return true;
     }
 
     isFleetReady () {
