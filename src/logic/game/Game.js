@@ -66,21 +66,21 @@ class Controller {
         const placed = this.gameState.turn.initialiseShip(x, y);
         if (!placed) return false;
         
-        this.startGame();
-        return true;
+        return this.startGame();
     }
 
     createPlayerFleet () {
         if (this.gameState.status !== "strategy") return false;
 
-        this.gameState.turn.initialiseFleet();
+        const placed = this.gameState.turn.initialiseFleet();
+        if (!placed) return false;
 
         if (this.gameState.enableAi === true) {
             this.nextTurn();
             this.gameState.turn.initialiseFleet();
         }
-        this.startGame();
-        return true;
+        
+        return this.startGame();
     }
 
     playTurn (x, y) {
