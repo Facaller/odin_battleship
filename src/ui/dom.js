@@ -90,6 +90,7 @@ export class Handler {
         start.addEventListener('click', (event) => {
             event.preventDefault();
             this.gameStart();
+            console.log('this works');
         });
     }
 

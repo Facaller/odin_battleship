@@ -1,7 +1,7 @@
 import { Player } from "../player/Player.js";
 import { Computer } from "../computer/computer.js";
 
-class Controller {
+export class Controller {
     constructor () {
         this.player1  = new Player();
         this.player2  = new Player();
@@ -28,6 +28,7 @@ class Controller {
         if (this.gameState.status !== "strategy") return false;
 
         this.gameState.enableAi = this.gameState.enableAi === true ? false : true;
+        return true;
     }
 
     setOrientation () {
@@ -66,7 +67,8 @@ class Controller {
         const placed = this.gameState.turn.initialiseShip(x, y);
         if (!placed) return false;
         
-        return this.startGame();
+        this.startGame();
+        return  true;
     }
 
     createPlayerFleet () {
