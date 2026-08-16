@@ -1,4 +1,9 @@
 import './style.css';
 import { Controller } from './logic/game/Game.js';
+import { Handler } from './ui/dom.js';
 
-const game = new Controller();
+document.addEventListener('DOMContentLoaded', () => {
+    const game = new Controller();
+    const dom = new Handler(game);
+    dom.gameStart();
+})

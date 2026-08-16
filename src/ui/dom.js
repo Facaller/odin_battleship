@@ -89,7 +89,7 @@ export class Handler {
         const start = this.elements.startBtn;
         start.addEventListener('click', (event) => {
             event.preventDefault();
-            this.gameStart();
+            this.game.gameStart();
             console.log('this works');
         });
     }
