@@ -20,7 +20,7 @@ export class Handler {
     }
 
     updateStatus (message) {
-        this.status.textContent = message;
+        this.elements.status.textContent = message;
     }
 
 //status & button methods
@@ -89,7 +89,7 @@ export class Handler {
         const start = this.elements.startBtn;
         start.addEventListener('click', (event) => {
             event.preventDefault();
-            this.game.gameStart();
+            this.gameStart();
             console.log('this works');
         });
     }
@@ -126,6 +126,26 @@ export class Handler {
         });
     }
 }
+
+// init() {
+//     this.bindEvents();
+// }
+
+// bindEvents() {
+//     this.elements.startBtn.addEventListener('click', () => {
+//         this.gameStart();
+//     });
+
+//     this.elements.resetBtn.addEventListener('click', () => {
+//         this.resetGame();
+//     });
+
+//     this.elements.randomBtn.addEventListener('click', () => {
+//         this.randomize();
+//     });
+// }
+
+// *************************************************
 
 // Your Handler class seems like it's going to be the bridge between your game logic and the UI. That's a good responsibility for it. The important thing is to keep the separation clear:
 

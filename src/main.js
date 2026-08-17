@@ -5,5 +5,7 @@ import { Handler } from './ui/dom.js';
 document.addEventListener('DOMContentLoaded', () => {
     const game = new Controller();
     const dom = new Handler(game);
-    dom.gameStart();
+    dom.handleStartGame();
+    
+    console.log('asdasdasd')
 })
