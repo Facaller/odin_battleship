@@ -94,7 +94,7 @@ export class Controller {
         
         if (this.checkWinCondition()) return;
         
-        this.this.nextTurn();
+        this.nextTurn();
         this.playAiTurn();
     }
 

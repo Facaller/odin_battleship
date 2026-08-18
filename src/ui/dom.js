@@ -17,6 +17,8 @@ export class Handler {
     constructor (Game) {
         this.game = Game;
         this.elements = new Elements();
+        
+        this.init();
     }
 
     updateStatus (message) {
@@ -84,66 +86,54 @@ export class Handler {
         }
     }
 
-//button events
-    handleStartGame = () => {
+    playTurn (x, y) {
+        const attack = this.game.playTurn(x, y);
+
+        if (!attack) {
+            this.updateStatus('')
+            return;
+        }
+    }
+
+// events
+
+    init () {
+        this.bindEvents();
+    }
+
+    bindEvents () {
         const start = this.elements.startBtn;
-        start.addEventListener('click', (event) => {
-            event.preventDefault();
+        start.addEventListener('click', () => {
             this.gameStart();
             console.log('this works');
         });
-    }
 
-    handleReset = () => {
         const reset = this.elements.resetBtn;
-        reset.addEventListener('click', (event) => {
-            event.preventDefault();
+        reset.addEventListener('click', () => {
 
         });
-    }
 
-    handleAiToggle = () => {
         const aiBtn = this.elements.aiBtn;
-        aiBtn.addEventListener('click', (event) => {
-            event.preventDefault();
+        aiBtn.addEventListener('click', () => {
             this.aiToggle();
         });
-    }
 
-    handleRandomDeployment () {
         const random = this.elements.randomBtn;
-        random.addEventListener('click', (event) => {
-            event.preventDefault();
+        random.addEventListener('click', () => {        
             this.randomDeployment();
         });
-    }
 
-    handleOrientation = () => {
         const orientate = this.elements.rotateBtn;
-        orientate.addEventListener('click', (event) => {
-            event.preventDefault();
+        orientate.addEventListener('click', () => {
             this.shipOrientation();
+        });
+
+        const allyBoard = this.elements.allyBoard;
+        allyBoard.addEventListener('click', () => {
+            this
         });
     }
 }
-
-// init() {
-//     this.bindEvents();
-// }
-
-// bindEvents() {
-//     this.elements.startBtn.addEventListener('click', () => {
-//         this.gameStart();
-//     });
-
-//     this.elements.resetBtn.addEventListener('click', () => {
-//         this.resetGame();
-//     });
-
-//     this.elements.randomBtn.addEventListener('click', () => {
-//         this.randomize();
-//     });
-// }
 
 // *************************************************
 
