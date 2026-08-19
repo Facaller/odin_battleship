@@ -16,13 +16,13 @@ export class GameBoard {
             }))
         );
     }
-
+//need to add creation method here and filter all the way up
     validateCoords (x, y) {
         if (x >= this.rows || x < 0) return false;
         if (y >= this.cols || y < 0) return false;
         return true;
     }
-
+//might need to add orientation check here
     validateShipCoords (ship, x, y) {
         if (x + ship.length > this.rows) return false;
         if (y + ship.length > this.cols) return false;

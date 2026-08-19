@@ -88,20 +88,17 @@ export class Handler {
 
     playTurn (x, y) {
         const attack = this.game.playTurn(x, y);
-
-        if (!attack) {
-            this.updateStatus('')
-            return;
-        }
+        if (!attack) return;
     }
 
 // events
 
     init () {
-        this.bindEvents();
+        this.bindButtonEvents();
+        this.bindBoardEvents(x, y)
     }
 
-    bindEvents () {
+    bindButtonEvents () {
         const start = this.elements.startBtn;
         start.addEventListener('click', () => {
             this.gameStart();
@@ -127,10 +124,17 @@ export class Handler {
         orientate.addEventListener('click', () => {
             this.shipOrientation();
         });
+    }
 
+    bindBoardEvents (x, y) {
         const allyBoard = this.elements.allyBoard;
         allyBoard.addEventListener('click', () => {
-            this
+            this.playTurn(x, y);
+        });
+
+        const foeBoard = this.elements.foeBoard;
+        foeBoard.addEventListener('click', () => {
+            this.placeShip(x, y);
         });
     }
 }
