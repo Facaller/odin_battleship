@@ -3,9 +3,9 @@ import { Controller } from './logic/game/Game.js';
 import { Handler } from './ui/dom.js';
 
 document.addEventListener('DOMContentLoaded', () => {
-    const game = new Controller();
-    const dom = new Handler(game);
-    dom.handleStartGame();
+    const controller = new Controller();
+    const handler = new Handler(controller);
+    handler.handleStartGame();
     
     console.log('asdasdasd')
 })

@@ -36,175 +36,188 @@ export class Player {
     }
 }
 
-// Yes — seeing these classes makes the architecture much clearer.
+// Ah, yes — with this context, I can see exactly where your question is coming from.
 
-// You are actually very close. Your Controller already has the path to the grid:
+// Your architecture is actually already set up nicely for this. The important thing is that the Controller already has access to the GameBoard indirectly through the Player:
 
-// Controller → Player → GameBoard → grid
+// Controller
+//    │
+//    ├── player1
+//    │      └── board
+//    │           └── grid
+//    │
+//    └── player2
+//           └── board
+//                └── grid
 
-// So I wouldn't add three methods just to pass the grid upward.
+// So your Controller doesn't need to create or know how to construct a GameBoard. It already has one through each Player.
 
-// What I'd do next
-// 1. Decide what the Controller needs from Player
+// At startup, I'd think about it like this
 
-// Your Controller has:
+// Your application starts:
+
+// DOMContentLoaded
+
+// ↓
+
+// Create Controller
+
+// ↓
+
+// Controller creates:
 
 // player1
 // player2
 // computer
 
-// And each Player has:
+// ↓
 
-// board
+// Each Player creates its own:
 
-// So if the Controller needs player 1's grid, it already conceptually has access to:
+// GameBoard
+// barracks
+// grid
 
-// player1 → board → grid
+// At this point, your game state exists entirely in JavaScript, but nothing has been drawn yet.
 
-// The question is whether you want the Controller accessing board directly.
+// That's where your DOM layer comes in.
 
-// I'd say this is the point where I'd introduce a small abstraction.
+// The Controller becomes the bridge
 
-// Your Player should be able to answer questions about its own board.
+// Your Controller knows:
+
+// "My player has a board."
+
+// Your DOM knows:
+
+// "I need to create visual cells."
+
+// So your startup process could conceptually be:
+
+// DOMContentLoaded
+
+// → instantiate Controller
+
+// → instantiate DOM
+
+// → Controller gets player1.board
+
+// → Controller asks DOM to render/display that board
+
+// The crucial point is that the DOM doesn't need to know about Player or GameBoard at all.
+
+// The Controller hands it the relevant information.
 
 // For example, conceptually:
 
-// "Player, give me your current board."
+// Controller: "DOM, here's player 1's board. Render it."
 
-// Then the Controller doesn't need to know that Player internally calls it board, or that the board is a GameBoard.
+// The DOM:
 
-// That gives you:
+// "Cool. It's 12 × 12. I'll create 144 cells."
 
-// Controller → Player → GameBoard
+// And you actually have two boards to think about
 
-// rather than:
+// This is worth considering now because it'll affect your DOM API.
 
-// Controller → Player → GameBoard → internal implementation details
+// Eventually your UI probably has something like:
 
-// 2. Don't make the Controller responsible for GameBoard internals
+// PLAYER BOARD          ENEMY BOARD
+// ┌──────────────┐      ┌──────────────┐
+// │              │      │              │
+// │    12 × 12   │      │    12 × 12   │
+// │              │      │              │
+// └──────────────┘      └──────────────┘
 
-// This is the key thing I'd change in your thinking.
+// Those correspond to:
 
-// Right now your Controller could potentially do something equivalent to:
+// player1.board
+// player2.board
 
-// "Go into player1, get their board, then go into that board and get its grid."
+// (or the computer's board, depending on how you've structured the game).
 
-// It works.
+// So your Controller could ultimately be responsible for saying:
 
-// But the Controller shouldn't really care how a Player stores their board.
+// "Render this board in the player's board container."
 
-// The Player's responsibility is to represent a player.
+// and
 
-// So if the Controller asks:
+// "Render that board in the opponent's board container."
 
-// "What's your board state?"
+// The DOM doesn't care whose board it is. It just receives the board information and the appropriate place to display it.
 
-// Player handles the fact that the board happens to live inside this.board.
+// One subtle design decision I'd make
 
-// 3. Then the Controller gives the state to the DOM
+// You don't necessarily want your DOM to receive the entire Player object.
 
-// Your eventual flow could therefore be:
+// For example, I'd avoid the conceptual relationship:
 
+// DOM → Player → GameBoard
+
+// because now your DOM is aware of game-domain objects.
+
+// Instead:
+
+// Controller → extracts what the DOM needs → DOM
+
+// For your initial rendering, that might simply be the grid.
+
+// So your Controller is effectively saying:
+
+// "Here's the board state you need to visually represent."
+
+// The DOM doesn't know that the state came from:
+
+// player1.board.grid
+
+// It just receives the board representation.
+
+// That keeps your boundary very clean.
+
+// There's also an important distinction between initial rendering and gameplay
+
+// At game start:
+
+// Controller
+//    ↓
+// player1.board.grid
+//    ↓
 // DOM
-// → user clicks something
+//    ↓
+// Create 144 cells
 
-// ↓
+// But once those cells exist, you don't want to repeatedly render the whole board.
 
-// Controller
-// → tells Player/GameBoard to perform an action
+// Suppose the player attacks (4, 7).
 
-// ↓
+// You'd have something like:
 
-// GameBoard
-// → modifies grid
-
-// ↓
-
-// Controller
-// → asks Player for the updated board state
-
-// ↓
-
-// DOM
-// → renders it
-
-// That's the important loop.
-
-// 4. You don't need to constantly "send" the grid around
-
-// This is another thing that might be tripping you up.
-
-// Your grid is an object living inside the GameBoard.
-
-// You don't need to physically move it:
-
-// GameBoard → Player → Controller → DOM
-
-// Instead, the objects can hold references to each other.
-
-// Your current structure already does that:
-
-// Controller
-// │
-// ├── player1
-// │     └── board
-// │           └── grid
-// │
-// ├── player2
-// │     └── board
-// │           └── grid
-// │
-// └── computer
-
-// So the grid isn't trapped.
-
-// The Controller can reach it because the Controller owns the Player, and the Player owns the GameBoard.
-
-// 5. I'd make one architectural decision before touching the DOM
-
-// Ask yourself:
-
-// Does my DOM need the actual GameBoard, or does it only need the information necessary to render it?
-
-// I'd strongly recommend the second.
-
-// The DOM shouldn't know about:
-
-// GameBoard
 // Player
-// ships
-// receiveAttack()
-// placeShip()
-// checkFleet()
+//    ↓
+// GameBoard.receiveAttack(4, 7)
+//    ↓
+// grid[4][7] changes
+//    ↓
+// Controller knows what happened
+//    ↓
+// DOM updates cell (4, 7)
 
-// It should essentially receive:
-
-// "Here is the current state of this board. Render it."
-
-// That keeps your DOM dumb, which is exactly what you want.
+// That's a very natural fit for the architecture you've already built.
 
 // One unrelated thing I noticed
 
 // Your setShipDirection() currently has a problem:
 
-// const direction = direction === ...
+// const direction = direction === 'horizontal'
 
-// You're declaring direction and then trying to read direction while declaring it. You presumably meant to base the new direction on the existing orientation somewhere.
+// You're declaring direction and then trying to read that same not-yet-initialised variable. I assume you intended to toggle based on the board's current orientation (or have the Board handle the toggle).
 
-// Also, your Player doesn't currently expose any way for the Controller to ask about its board state. That's the first thing I'd think about adding.
+// Also, your attack() currently delegates directly to the enemy board, which is fine if that's intentional, but your Controller will eventually be a useful place to coordinate whose turn it is, whether an attack is legal, and what the UI should update afterward.
 
-// So I would proceed in this order:
+// Neither of those changes your grid question, though.
 
-// GameBoard
-// → establish how board state can be read
+// For the grid specifically, your architecture already gives you the path:
 
-// Player
-// → expose the relevant board state to whoever coordinates the player
+// Controller owns Players → Players own Boards → Controller extracts board state → DOM turns that state into visual cells.
 
-// Controller
-// → retrieve the state from the Player
-
-// DOM
-// → accept that state and render it
-
-// You don't need to change your overall class hierarchy. You're basically just defining the public interface between each existing layer.
+// You don't need to change your GameBoard or Player just to make the grid appear.
