@@ -141,198 +141,138 @@ export class Handler {
 
 // *************************************************
 
-// 1. Your DOM class
+// One thing I'd change from my previous suggestion is not to turn ship into a boolean unless that's actually what your UI needs. Your Ship class has meaningful state (length, hit, sunk), so the Controller should decide what subset of that state the DOM needs.
 
-// The DOM class receives a board and turns its 2D grid into visual cells:
+// Your current dependency structure
 
-// export class DOM {
-//     constructor () {
-//         this.playerBoard = document.querySelector("#player-board");
-//         this.enemyBoard = document.querySelector("#enemy-board");
-//     }
+// You effectively have:
 
-//     renderBoard (board, container) {
-//         container.replaceChildren();
+// Ship → GameBoard → Player → Controller → Handler → Elements/DOM
 
-//         board.grid.forEach((row, rowIndex) => {
-//             row.forEach((cell, colIndex) => {
-//                 const cellElement = document.createElement("div");
+// That's a nice one-way dependency chain.
 
-//                 cellElement.classList.add("cell");
+// Your Handler currently receives the Controller:
 
-//                 cellElement.dataset.row = rowIndex;
-//                 cellElement.dataset.col = colIndex;
-
-//                 container.appendChild(cellElement);
-//             });
-//         });
-//     }
-
-//     renderPlayerBoard (board) {
-//         this.renderBoard(board, this.playerBoard);
-//     }
-
-//     renderEnemyBoard (board) {
-//         this.renderBoard(board, this.enemyBoard);
-//     }
-// }
-
-// The important part is this:
-
-// GameBoard.grid
-//        ↓
-//      rows
-//        ↓
-//      cells
-//        ↓
-// DOM elements
-
-// Your grid already contains 12 rows containing 12 objects, so the DOM just walks through it and creates one element for each object.
-
-// 2. Your Controller
-
-// Your Controller already creates the Players, so you just need your DOM instance available and then render their boards.
-
-// Conceptually:
-
-// import { Player } from "../player/Player.js";
-// import { Computer } from "../computer/computer.js";
-// import { DOM } from "../dom/DOM.js";
-
-// export class Controller {
-//     constructor () {
-//         this.player1 = new Player();
-//         this.player2 = new Player();
-//         this.computer = new Computer();
-
-//         this.dom = new DOM();
-
-//         this.gameState = {
-//             status: "strategy",
-//             turn: this.player1,
-//             enableAi: false,
-//             winner: null
-//         };
-
-//         this.initialiseGame();
-//     }
-
-//     initialiseGame () {
-//         this.dom.renderPlayerBoard(this.player1.board);
-//         this.dom.renderEnemyBoard(this.player2.board);
-//     }
-// }
-
-// Now notice the chain:
-
-//                  Controller
-//                  /        \
-//                 /          \
-//            player1       player2
-//               ↓              ↓
-//             board           board
-//               ↓              ↓
-//             grid            grid
-//               ↓              ↓
-//              DOM            DOM
-
-// The Controller is the bridge.
-
-// 3. Then your entry point
-
-// Somewhere you have your application entry point — perhaps index.js, main.js, etc.
-
-// That's where I'd initialise the Controller after the DOM has loaded.
-
-// For example:
-
-// import { Controller } from "./controller/Controller.js";
-
-// document.addEventListener("DOMContentLoaded", () => {
-//     new Controller();
-// });
-
-// Now the complete startup sequence is:
-
-// DOMContentLoaded
-//        ↓
-// new Controller()
-//        ↓
-// new Player()
-//        ↓
-// new GameBoard()
-//        ↓
-// GameBoard creates 12 × 12 grid
-//        ↓
-// Controller.initialiseGame()
-//        ↓
-// DOM.renderPlayerBoard(player1.board)
-//        ↓
-// DOM creates 144 cells
-
-// And you have your visual board.
-
-// 4. Your HTML only needs the containers
-
-// You don't need to manually create any cells.
-
-// Something like:
-
-// <div id="player-board"></div>
-
-// <div id="enemy-board"></div>
-
-// The JavaScript creates the 144 children inside each one.
-
-// Then CSS can turn the container into your 12 × 12 grid.
-
-// For example, conceptually:
-
-// #player-board,
-// #enemy-board {
-//     display: grid;
-//     grid-template-columns: repeat(12, 1fr);
-// }
-
-// And your .cell gives each square its appearance.
-
-// 5. Now you have coordinates attached to every cell
-
-// This part is particularly useful for Battleship:
-
-// cellElement.dataset.row = rowIndex;
-// cellElement.dataset.col = colIndex;
-
-// So the DOM visually contains something equivalent to:
-
-// cell → row 0, col 0
-// cell → row 0, col 1
-// cell → row 0, col 2
-// ...
-// cell → row 11, col 11
-
-// When a player eventually clicks a cell, your DOM can retrieve those coordinates and tell the Controller:
-
-// "The player clicked 4, 7."
-
-// The Controller then decides what that means.
-
-// The DOM doesn't need to know whether (4, 7) contains a ship, whether the attack is valid, whether the ship is sunk, etc.
-
-// One thing I'd change depending on your exact design
-
-// If your DOM is already constructed elsewhere and the Controller is supposed to be the only thing the DOM communicates with, I'd probably make the relationship slightly more explicit:
-
+// Handler
+//   ↓
 // Controller
-//     │
-//     ├── player1.board ──────┐
-//     │                       ↓
-//     │                      DOM
-//     │                       ↑
-//     └── player2.board ──────┘
+//   ↓
+// Player
+//   ↓
+// GameBoard
+//   ↓
+// Ship
 
-// So the DOM is essentially a renderer. It doesn't own the board and doesn't know about Players.
+// That's okay because the Handler isn't being given those objects directly. It communicates through the Controller.
 
-// That is a very clean architecture for your project.
+// Where I'd put the grid conversion
 
-// Also, you don't actually need to pass the entire GameBoard if you don't want to. You could pass board.grid, but I personally like renderBoard(board) here because the Controller is explicitly saying "render this board", while the DOM can then access whatever board information it needs to render it.
+// I'd keep the actual GameBoard completely unaware of the DOM.
+
+// The Controller can have a method whose job is essentially:
+
+// "Give the UI a representation of this player's board."
+
+// For your particular structure, I'd probably return something like:
+
+// getPlayerGrid(player) {
+//     return player.board.grid.map(row =>
+//         row.map(cell => ({
+//             hit: cell.hit,
+//             miss: cell.miss,
+//             ship: cell.ship
+//                 ? {
+//                     length: cell.ship.length,
+//                     hit: cell.ship.hit,
+//                     sunk: cell.ship.sunk
+//                 }
+//                 : null
+//         }))
+//     );
+// }
+
+// Now notice what's happening.
+
+// The DOM gets:
+
+// {
+//     hit: false,
+//     miss: false,
+//     ship: {
+//         length: 5,
+//         hit: 2,
+//         sunk: false
+//     }
+// }
+
+// rather than:
+
+// {
+//     hit: false,
+//     miss: false,
+//     ship: Ship instance
+// }
+
+// That's a significant distinction.
+
+// The first is plain data.
+
+// The second is an actual domain object.
+
+// So if your Handler does something like:
+
+// const grid = this.game.getPlayerGrid(player);
+
+// it receives data it can render, but it doesn't receive your actual Ship instances.
+
+// Why this is particularly useful with your Ship class
+
+// Your Ship contains behaviour:
+
+// isSunk()
+// isHit()
+
+// The DOM shouldn't be able to do something like "hit this ship" by calling a method on your Ship.
+
+// That's game logic.
+
+// Instead, the Controller/GameBoard handles the actual hit, updates the Ship, and then the Controller can give the DOM an updated representation.
+
+// So you get:
+
+// User clicks cell
+
+// → Handler tells Controller what cell was clicked
+
+// → Controller/GameBoard handles the game logic
+
+// → Ship is updated
+
+// → Controller provides updated board data
+
+// → Handler renders it
+
+// That's a really clean separation.
+
+// One thing I'd keep an eye on
+
+// Your Handler constructor parameter is called Game, but you're actually passing a Controller:
+
+// const controller = new Controller();
+// const handler = new Handler(controller);
+
+// I'd call it controller rather than Game.
+
+// It's a small thing, but names become increasingly valuable as your project grows. Your Handler isn't communicating with "the game" generically; it's communicating with the Controller.
+
+// So overall, I'd say your architecture is heading in a good direction:
+
+// Game logic
+
+// Ship → GameBoard → Player → Controller
+
+// Presentation
+
+// Controller → Handler → Elements
+
+// And the Controller is the boundary where you transform your internal game state into plain data that the UI can safely consume.
