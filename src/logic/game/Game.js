@@ -50,6 +50,23 @@ export class Controller {
         }
     }
 
+    getPlayerGrid () {
+        let player = this.gameState.turn;
+        return player.board.grid.map(row => 
+            row.map(cell => ({
+                hit: cell.hit,
+                miss: cell.miss,
+                ship: cell.ship
+                    ? {
+                        length: cell.ship.length,
+                        hit: cell.ship.hit,
+                        sunk: cell.ship.sunk
+                    }
+                    : null
+            }))
+        );
+    }
+
     startGame () {
         if (this.gameState.status !== "strategy") return false;
         if (!this.gameState.turn.isFleetReady()) return false;
