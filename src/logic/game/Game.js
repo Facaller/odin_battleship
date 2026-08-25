@@ -50,8 +50,17 @@ export class Controller {
         }
     }
 
-    getPlayerGrid () {
-        let player = this.gameState.turn;
+    getPlayerOne () {
+        const playerOne = this.player1;
+        return playerOne;
+    }
+
+    getPlayerTwo () {
+        const playerTwo = this.player2;
+        return playerTwo;
+    }
+
+    getPlayerGrid (player) {
         return player.board.grid.map(row => 
             row.map(cell => ({
                 hit: cell.hit,
