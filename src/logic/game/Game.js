@@ -50,14 +50,12 @@ export class Controller {
         }
     }
 
-    getPlayerOne () {
-        const playerOne = this.player1;
-        return playerOne;
+    getPlayerOneGrid () {
+        return this.getPlayerGrid(this.player1);
     }
 
-    getPlayerTwo () {
-        const playerTwo = this.player2;
-        return playerTwo;
+    getPlayerTwoGrid () {
+        return this.getPlayerGrid(this.player2);
     }
 
     getPlayerGrid (player) {

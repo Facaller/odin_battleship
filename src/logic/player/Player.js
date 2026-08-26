@@ -21,9 +21,7 @@ export class Player {
     }
 
     isFleetReady () {
-        if (this.board.checkFleet()) return true;
-
-        return false;
+        return this.board.checkFleet() ;
     }
 
     setShipDirection () {

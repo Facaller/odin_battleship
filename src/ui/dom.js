@@ -75,6 +75,11 @@ export class Handler {
     }
 
 //board methods
+//Remove these params. Create method that captures click coordinates.
+//Use that for controller methods instead
+    renderGrid (grid, gridContainer) {
+
+    }
 
     placeShip (x, y) {
         const setShip = this.controller.setShip(x, y);
@@ -125,7 +130,8 @@ export class Handler {
             this.shipOrientation();
         });
     }
-
+//this is incorrect because the Handler should only know about clicks.
+//The controller decides what that click means (playTurn or placeShip)
     bindBoardEvents (x, y) {
         const allyBoard = this.elements.allyBoard;
         allyBoard.addEventListener('click', () => {
@@ -134,7 +140,7 @@ export class Handler {
 
         const foeBoard = this.elements.foeBoard;
         foeBoard.addEventListener('click', () => {
-            this.placeShip(x, y);
+            this.playTurn(x, y);
         });
     }
 }
