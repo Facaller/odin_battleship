@@ -18,7 +18,7 @@ export class Handler {
         this.controller = controller;
         this.elements = new Elements();
         
-        this.init(x, y);
+        this.init();
     }
 
     updateStatus (message) {
@@ -78,10 +78,19 @@ export class Handler {
 //Remove these params. Create method that captures click coordinates.
 //Use that for controller methods instead
     renderGrid (grid, gridContainer) {
+        grid.forEach((row, rowIndex) => {
+            const rowElement = document.createElement('div');
 
+            row.forEach((cell, colIndex) => {
+                const cellElement = document.createElement('div');
+
+                rowElement.dataset.row = rowIndex;
+                cellElement.dataset.col = colIndex;
+            })
+        });
     }
 
-    placeShip (x, y) {
+    placeShip () {
         const setShip = this.controller.setShip(x, y);
 
         if (!setShip) {
@@ -91,16 +100,16 @@ export class Handler {
         }
     }
 
-    playTurn (x, y) {
+    playTurn () {
         const attack = this.controller.playTurn(x, y);
         if (!attack) return;
     }
 
 // events
 
-    init (x, y) {
+    init () {
         this.bindButtonEvents();
-        this.bindBoardEvents(x, y)
+        this.bindBoardEvents()
     }
 
     bindButtonEvents () {
@@ -132,18 +141,34 @@ export class Handler {
     }
 //this is incorrect because the Handler should only know about clicks.
 //The controller decides what that click means (playTurn or placeShip)
-    bindBoardEvents (x, y) {
+    bindBoardEvents () {
         const allyBoard = this.elements.allyBoard;
         allyBoard.addEventListener('click', () => {
-            this.playTurn(x, y);
+            
         });
 
         const foeBoard = this.elements.foeBoard;
         foeBoard.addEventListener('click', () => {
-            this.playTurn(x, y);
+            
         });
     }
 }
+
+// grid.forEach((row, rowIndex) => {
+//     const rowElement = document.createElement('div');
+//     rowElement.dataset.row = rowIndex;
+
+//     row.forEach((cell, colIndex) => {
+//         const colElement = document.createElement('div');
+
+//         colElement.dataset.row = rowIndex;
+//         colElement.dataset.col = colIndex;
+
+//         // append colElement somewhere...
+//     });
+
+//     // append rowElement somewhere...
+// });
 
 // *************************************************
 
