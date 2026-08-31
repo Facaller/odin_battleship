@@ -146,16 +146,119 @@ export class Handler {
 //The controller decides what that click means (playTurn or placeShip)
     bindBoardEvents () {
         const allyBoard = this.elements.allyBoard;
-        allyBoard.addEventListener('click', () => {
-            
+        allyBoard.addEventListener('click', (e) => {
+            const cell = e.target;
+
+            if (cell.matches('.cell')) {
+                const x = Number(cell.dataset.row);
+                const y = Number(cell.dataset.col);
+            }
         });
 
         const foeBoard = this.elements.foeBoard;
-        foeBoard.addEventListener('click', () => {
-            
+        foeBoard.addEventListener('click', (e) => {
+            const cell = e.target;
+
+            if (cell.matches('.cell')) {
+                const x = Number(cell.dataset.row);
+                const y = Number(cell.dataset.col);
+            }
         });
     }
 }
+
+// Yes — you've got the architecture right. There is just one small distinction I'd make: the Handler method doesn't really need to use the x and y beyond extracting/passing them along.
+
+// Think of the flow as:
+
+// DOM click
+//    ↓
+// Handler listener
+//    ↓
+// Handler extracts x/y
+//    ↓
+// Handler calls Controller method with x/y
+//    ↓
+// Controller checks game state
+//    ↓
+// Controller decides:
+//    ├── placeShip(x, y)
+//    └── attack(x, y)
+
+// So yes, you'd have roughly one additional method in each class.
+
+// In your Handler
+
+// Your listener could become:
+
+// bindBoardEvents () {
+//     const allyBoard = this.elements.allyBoard;
+
+//     allyBoard.addEventListener('click', (e) => {
+//         const cell = e.target;
+
+//         if (cell.tagName === 'DIV') {
+//             const x = Number(cell.dataset.row);
+//             const y = Number(cell.dataset.col);
+
+//             this.handleBoardClick(x, y);
+//         }
+//     });
+
+//     // ...
+// }
+
+// And then:
+
+// handleBoardClick(x, y) {
+//     this.controller.handleBoardClick(x, y);
+// }
+
+// The important thing here is that the Handler doesn't say placeShip or attack.
+
+// It just says:
+
+// "Controller, someone clicked (x, y)."
+
+// Then in your Controller
+
+// You have something like:
+
+// handleBoardClick(x, y) {
+//     if (this.gameState === 'placing') {
+//         this.placeShip(x, y);
+//     } else if (this.gameState === 'playing') {
+//         this.attack(x, y);
+//     }
+// }
+
+// That's where the decision belongs.
+
+// One thing I'd consider
+
+// You don't necessarily need the extra Handler method:
+
+// handleBoardClick(x, y) {
+//     this.controller.handleBoardClick(x, y);
+// }
+
+// You could have the listener directly call the Controller:
+
+// allyBoard.addEventListener('click', (e) => {
+//     const cell = e.target;
+
+//     if (cell.tagName === 'DIV') {
+//         const x = Number(cell.dataset.row);
+//         const y = Number(cell.dataset.col);
+
+//         this.controller.handleBoardClick(x, y);
+//     }
+// });
+
+// But if you're intentionally designing your Handler as a layer that handles DOM events and communicates those events to the Controller, having the Handler method is perfectly reasonable and can make the responsibilities clearer.
+
+// *****************************************************
+
 
 // Step 1 — Establish what the Handler's responsibility is
 
