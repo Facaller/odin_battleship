@@ -49,7 +49,7 @@ export class Controller {
             return this.player1;
         }
     }
-
+//use these to get specific grids
     getPlayerOneGrid () {
         return this.getPlayerGrid(this.player1);
     }
@@ -72,6 +72,14 @@ export class Controller {
                     : null
             }))
         );
+    }
+
+    handleBoardClicks (x, y) {
+        if (this.gameState === "strategy") {
+            this.setShip(x, y);
+        } else if (this.gameState === "playing") {
+            this.playTurn(x, y);
+        }
     }
 
     startGame () {
