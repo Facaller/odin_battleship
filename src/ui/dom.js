@@ -21,6 +21,13 @@ export class Handler {
         this.init();
     }
 
+    init () {
+        this.bindButtonEvents();
+        this.bindBoardEvents();
+        this.renderAllyGrid();
+        this.renderFoeGrid();
+    }
+
     updateStatus (message) {
         this.elements.status.textContent = message;
     }
@@ -95,12 +102,21 @@ export class Handler {
         });
     }
 
-// events
+    renderAllyGrid () {
+        const allyGrid  = this.controller.getPlayerOneGrid();
+        const allyBoard = this.elements.allyBoard;
 
-    init () {
-        this.bindButtonEvents();
-        this.bindBoardEvents();
+        this.renderGrid(allyGrid, allyBoard);
     }
+
+    renderFoeGrid () {
+        const foeGrid  = this.controller.getPlayerTwoGrid();
+        const foeBoard = this.elements.foeBoard;
+
+        this.renderGrid(foeGrid, foeBoard);
+    }
+
+// events
 
     bindButtonEvents () {
         const start = this.elements.startBtn;
