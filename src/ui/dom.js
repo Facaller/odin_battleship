@@ -116,6 +116,14 @@ export class Handler {
         this.renderGrid(foeGrid, foeBoard);
     }
 
+    updateAllyGrid () {
+        
+    }
+
+    updateFoeGrid () {
+
+    }
+
 // events
 
     bindButtonEvents () {
