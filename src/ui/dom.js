@@ -81,17 +81,13 @@ export class Handler {
         }
     }
 
-//board methods
-//Remove these params. Create method that captures click coordinates.
-//Use that for controller methods instead
-
-//create individual methods to get player 1 grid then player 2 grid
     renderGrid (grid, gridContainer) {
         grid.forEach((row, rowIndex) => {
             const rowElement = document.createElement('div');
 
             row.forEach((_, colIndex) => {
                 const cellElement = document.createElement('div');
+                cellElement.classList.add('cell');
 
                 cellElement.dataset.row = rowIndex;
                 cellElement.dataset.col = colIndex;
@@ -153,8 +149,7 @@ export class Handler {
             this.shipOrientation();
         });
     }
-//this is incorrect because the Handler should only know about clicks.
-//The controller decides what that click means (playTurn or placeShip)
+
     bindBoardEvents () {
         const allyBoard = this.elements.allyBoard;
         allyBoard.addEventListener('click', (e) => {
@@ -186,411 +181,591 @@ export class Handler {
     }
 }
 
-// *****************************************************
+// Step 1 — Fix the connection between your DOM cells and your click listener
 
-
-// Step 1 — Establish what the Handler's responsibility is
-
-// You've already identified this yourself:
-
-// "The Handler should only know about clicks."
-
-// That's a good rule for this project.
-
-// Think of the Handler as the translator between:
-
-// DOM event → Controller instruction
-
-// So the Handler should know things like:
-
-// A button was clicked.
-// A board cell was clicked.
-// Which board was clicked.
-// Which row/column was clicked.
-
-// But it shouldn't decide:
-
-// whether a ship can be placed
-// whether it's the player's turn
-// whether an attack is valid
-// whether the game has started
-// whether a ship is sunk
-
-// Those belong elsewhere.
-
-// So before writing more code, I'd make yourself this little rule:
-
-// Handler detects what the user interacted with. Controller decides what that interaction means.
-
-// That's your architectural compass.
-
-// Step 2 — Finish renderGrid() conceptually
-
-// You're actually very close here.
-
-// Your renderGrid() needs to accomplish two things:
-
-// A. Create the visual grid
-
-// You're doing that already.
-
-// B. Give each cell enough identity for a click
-
-// You're also doing that:
-
-// rowIndex
-// colIndex
-
-// You've correctly realized you don't need:
-
-// rowElement.dataset.row
-
-// because the cell itself knows its coordinates.
-
-// Now ask yourself:
-
-// "When a user clicks a cell, what information will I need to give the Controller?"
-
-// You should be able to answer:
-
-// row
-// column
-
-// And possibly:
-
-// which board?
-
-// That last question is important because you have two boards.
-
-// Step 3 — Decide how the Handler identifies the clicked cell
-
-// This is the next thing I'd work on.
-
-// Your event listener currently looks like:
-
-// allyBoard.addEventListener('click', () => {
-    
-// });
-
-// Don't worry about calling the Controller yet.
-
-// First, make the Handler capable of answering:
-
-// "Which cell did the user click?"
-
-// Remember that the event listener receives an event object.
-
-// So your next exercise should be:
-
-// Receive the event.
-// Inspect the element that was clicked.
-// Determine whether that element is a cell.
-// Get its data-row.
-// Get its data-col.
-// Convert them into numbers if necessary.
-
-// Don't worry about placeShip() or playTurn() yet.
-
-// Just get to the point where you can click a cell and log something like:
-
-// row: 4
-// col: 7
-
-// That's your next milestone.
-
-// Step 4 — Think carefully about target vs currentTarget
-
-// This is an important DOM concept for your particular setup.
-
-// You have:
-
-// foeBoard
-//    ↓
-// rowElement
-//    ↓
-// cellElement
-
-// Your listener is attached to the board, not each individual cell.
-
-// So when you click:
-
-// cellElement
-
-// the event bubbles upward to:
-
-// foeBoard
-
-// This is called event delegation, and it's actually a nice approach for your grid.
-
-// Your Handler needs to distinguish:
-
-// "The board received the event"
-
-// from:
-
-// "This particular cell was clicked."
-
-// That's where the event's target and currentTarget concepts become important.
-
-// I would spend a little time understanding those before proceeding. You don't need to memorize them—just understand what each one represents in your particular DOM tree.
-
-// Step 5 — Don't use cell in the click Handler
-
-// This connects to your previous question.
-
-// Your renderGrid() has:
-
-// row.forEach((cell, colIndex) => {
-
-// That cell belongs to your view model.
-
-// Your click handler deals with a DOM element.
-
-// Those are two different things.
-
-// Think:
-
-// renderGrid
-//     ↓
-// cell object
-//     ↓
-// creates
-//     ↓
-// cellElement
-//     ↓
-// user clicks
-//     ↓
-// event
-//     ↓
-// Handler
-
-// You don't need to somehow carry the cell object through the event.
-
-// Your Handler can identify:
-
-// row + col
-
-// and your Controller/GameBoard can use those coordinates to determine what the actual game state is.
-
-// This is another reason I wouldn't put the Ship snapshot into dataset.
-
-// Step 6 — Decide what the two board listeners actually mean
-
-// You have:
-
-// allyBoard.addEventListener(...)
-// foeBoard.addEventListener(...)
-
-// This is where your comment is particularly useful:
-
-// "The controller decides what that click means (playTurn or placeShip)"
-
-// Exactly.
-
-// Ask yourself:
-
-// Ally board click
-
-// During the strategy/deployment phase:
-
-// click ally cell
-//         ↓
-// Handler gets coordinates
-//         ↓
-// Controller is told about the coordinates
-//         ↓
-// Controller decides whether this means placement
-// Foe board click
-
-// During battle:
-
-// click foe cell
-//         ↓
-// Handler gets coordinates
-//         ↓
-// Controller is told about the coordinates
-//         ↓
-// Controller decides whether this means attack
-
-// Notice that the Handler doesn't need to contain:
-
-// if (gameState.status === ...)
-
-// That's Controller territory.
-
-// Step 7 — Your placeShip() and playTurn() methods need reconsideration
-
-// Right now you have:
-
-// placeShip () {
-//     const setShip = this.controller.setShip(x, y);
-
-// and:
-
-// playTurn () {
-//     const attack = this.controller.playTurn(x, y);
-
-// Obviously x and y don't exist yet.
-
-// But don't immediately fix them by making the Handler somehow magically know x and y.
-
-// Instead, go back to Step 3.
-
-// Your event handler should obtain:
-
-// row
-// col
-
-// Then ask:
-
-// "Who should receive those coordinates?"
-
-// The answer should lead you toward how these methods should be structured.
-
-// You might also notice that you don't necessarily need separate Handler methods called placeShip() and playTurn() at all.
-
-// That's something I'd deliberately leave undecided until you've worked through the event flow.
-
-// Your own comment is pointing you toward this realization.
-
-// Step 8 — Don't worry about resetMethod() yet
-
-// I'd put this aside.
-
-// You currently have:
-
-// resetMethod () {
-//     //create new Game haha wut
-// }
-
-// That's a separate architectural question.
-
-// Eventually you'll need to decide whether resetting means:
-
-// replace Controller state
-
-// or:
-
-// reset existing objects
-
-// But that isn't blocking your board interaction.
-
-// Don't let it distract you.
-
-// Step 9 — Don't add Ship data to the DOM yet
-
-// This is the thing I'd specifically not do next.
+// Before doing anything else, make sure every rendered cell is actually identifiable as a cell.
 
 // You already have:
 
-// getPlayerGrid()
+// data-row
+// data-col
 
-// which produces:
+// That's good.
 
-// cell
-//  ├── hit
-//  ├── miss
-//  └── ship
-//       ├── length
-//       ├── hit
-//       └── sunk
+// You also have your listener looking for .cell.
 
-// That's your view model.
+// So your first task is simply:
 
-// Your DOM cell only needs enough information to identify itself and visually represent whatever state you've decided to show.
+// Make sure the cells created by renderGrid() have the .cell class.
 
-// So for now, keep these concepts separate:
+// Then test it.
 
-// GAME STATE
-// GameBoard.grid
-//     ↓
-// VIEW MODEL
-// getPlayerGrid()
-//     ↓
-// DOM
-// cellElement
-//     ↓
-// USER EVENT
-// click
-//     ↓
-// HANDLER
-// row + col
-//     ↓
-// CONTROLLER
-// what does this click mean?
+// When you click a cell, you should be able to confirm:
 
-// That's the architecture I'd try to hold in your head.
+// "My Handler receives the correct row and column."
 
-// Step 10 — Your immediate coding exercise
+// Don't touch the game logic yet.
 
-// If I were mentoring you through this, I wouldn't ask you to implement another game feature yet.
+// Done when: clicking (3, 5) reliably gives your Handler 3, 5.
 
-// I'd give you this one task:
+// Step 2 — Get one complete attack working through the Controller
 
-// Make this work:
+// Now temporarily forget the DOM updating.
 
-// When I click a cell on either board, the Handler can identify the row and column of the clicked cell.
+// Take this journey:
 
-// Nothing more.
+// Click enemy cell
 
-// Don't call the Controller yet.
+// → Handler gets (row, col)
 
-// Don't place a ship.
+// → Handler calls Controller
 
-// Don't attack.
+// → Controller calls the appropriate Player/GameBoard method
 
-// Don't update the game.
+// → GameBoard changes that cell
 
-// Just prove that you can go:
+// Your goal here is to verify that the model actually changes correctly.
 
-// click
-//  ↓
-// clicked element
-//  ↓
-// row
-//  ↓
-// column
+// For example:
 
-// Once that works, come back to the Controller.
+// Before: enemy cell (3,5) is untouched
+// Click (3,5)
+// After: that cell is marked as hit/miss appropriately
 
-// Then we'll trace:
+// Use your console if necessary to inspect the state.
 
-// clicked cell
-//      ↓
-// coordinates
-//      ↓
-// Controller
-//      ↓
-// what should happen?
+// Done when: one click produces the correct change in the actual GameBoard.
 
-// That will naturally expose what your next methods should look like.
+// Step 3 — Decide what the Controller gives back to the Handler
 
-// For your project right now, that's:
+// This is the most important step.
+
+// Right now your Handler does:
+
+// controller.handleBoardClicks(x, y)
+
+// …and then basically forgets about it.
+
+// You need to establish a communication path back.
+
+// Ask:
+
+// "After the Controller handles this click, what does the Handler need to know?"
+
+// For the moment, keep it extremely simple.
+
+// The Handler needs to know:
+
+// Which board changed?
+// Which cell changed?
+// What is the new state of that cell?
+
+// You don't need to design some giant event system.
+
+// Think about a single attack:
+
+// Player clicked foe (3,5) → it was a miss.
+
+// That's enough information for the Handler to update the visual representation of that cell.
+
+// Done when: you can clearly describe what information travels from Controller → Handler after an attack.
+
+// Step 4 — Build the "find this cell" part of your DOM Handler
+
+// Now return to your DOM.
+
+// You already have:
+
+// data-row="3"
+// data-col="5"
+
+// So your next task is to create the DOM-side mechanism for saying:
+
+// "Give me the DOM cell corresponding to row 3, column 5."
+
+// Don't worry about hits, misses, ships, colours, or styling yet.
+
+// Just solve:
+
+// coordinates → correct DOM element
+
+// You should be able to conceptually do:
+
+// (3,5) → enemy board → corresponding <div>
+
+// This is the foundation of your individual-cell updating.
+
+// Done when: you can reliably identify the exact DOM cell that corresponds to a GameBoard coordinate.
+
+// Step 5 — Make that one cell visually reflect its new state
+
+// Now you finally connect everything.
+
+// Your complete flow becomes:
+
+// Player clicks enemy cell
+
+// ↓
+
+// Handler gets coordinates
+
+// ↓
+
+// Controller performs attack
+
+// ↓
+
+// GameBoard changes
+
+// ↓
+
+// Controller communicates the result/state
+
+// ↓
+
+// Handler identifies that DOM cell
+
+// ↓
+
+// Handler changes its visual state
+
+// And that's your first proper game-state → DOM update loop.
+
+// Start with only hit vs miss.
+
+// Don't worry about:
+
+// sunk ships
+// AI
+// turns
+// game over
+// reset
+// fancy animations
+// status messages
+
+// Just get:
+
+// click → attack → hit/miss → one cell changes visually
+
+// working perfectly.
+
+// Your immediate roadmap
+
+// So for now, literally put everything else out of your head:
+
+// 1. Make .cell and the click listener match
+
+// ⬇️
+
+// 2. Verify one click actually changes GameBoard state
+
+// ⬇️
+
+// 3. Decide what information Controller returns to Handler
+
+// ⬇️
+
+// 4. Make coordinates locate the correct DOM cell
+
+// ⬇️
+
+// 5. Make that cell visually represent hit/miss
+
+// Once Step 5 works, stop.
+
+// That's your next milestone.
+
+// Then we can take the next five steps from that point, probably starting with ship placement and making the deployment phase update the ally board.
+
+// The key is: don't build the whole UI architecture in your head right now. You're at the point where you should get one complete vertical slice working — one click all the way from the DOM to GameBoard and back to the DOM.
+
+// *****************************************************
+
+
+// The main thing I’d change in your thinking is this:
+
+// The DOM should not decide what changed. The Controller/GameState should tell the DOM what changed, and the DOM should reflect that change.
+
+// You’re very close to a clean MVC-ish flow.
+
+// Where you are now
+
+// Your current architecture is essentially:
 
 // User clicks cell
-//        ↓
-// Handler identifies cell
-//        ↓
-// row + col
+// → Handler gets coordinates
+// → Controller receives coordinates
+// → Controller decides what the click means
+// → GameBoard changes
+// → Controller exposes the resulting state
+// → Handler updates the DOM
 
-// Then:
+// That is a good direction.
 
-// row + col
-//        ↓
-// Controller receives them
-//        ↓
-// Controller determines action
+// I would not make the DOM re-render the whole board after every shot. You have a persistent 12×12 grid already sitting in the DOM, so destroying and rebuilding 144 cells every time someone fires is unnecessary.
 
-// Then:
+// Instead:
 
-// action
-//        ↓
-// GameBoard changes state
+// Game state changes
+// → identify affected coordinate(s)
+// → update that DOM cell
+// → leave everything else alone.
 
-// Then:
+// Your next steps, in order
+// 1. Finish handleBoardClicks() conceptually
 
-// new state
-//        ↓
-// view model
-//        ↓
-// DOM updates
+// Before worrying about DOM updates, make sure the Controller can correctly answer:
+
+// "What should happen when the player clicks (x, y)?"
+
+// You already have the two major modes:
+
+// strategy → ship placement
+// playing → attacking
+
+// But there's an important issue in the code you showed:
+
+// Your gameState is an object, but you're comparing it as though it were a string.
+
+// You're currently thinking along the lines of:
+
+// gameState === "strategy"
+
+// But your actual state is:
+
+// gameState.status === "strategy"
+
+// So fix that conceptual mismatch first.
+
+// This is important because everything downstream depends on the Controller correctly determining what action a click represents.
+
+// 2. Make the Controller's actions produce a meaningful result
+
+// This is probably your real next architectural step.
+
+// Right now your Handler calls:
+
+// this.controller.handleBoardClicks(x, y)
+
+// But then the Handler doesn't know what happened.
+
+// Imagine the player clicks an enemy cell.
+
+// Several things could happen:
+
+// It was already attacked → nothing changes.
+// It was an empty cell → miss.
+// It contained a ship → hit.
+// It was the final hit on a ship → ship becomes sunk.
+// It was the final ship → game ends.
+// The turn changes.
+
+// The DOM shouldn't have to figure any of this out.
+
+// The Controller should be able to say, conceptually:
+
+// "That click resulted in a hit at row 4, column 7."
+
+// or
+
+// "That click resulted in a miss at row 4, column 7."
+
+// or potentially:
+
+// "That click was invalid; nothing changed."
+
+// This is the bridge you're currently missing between your game logic and your DOM.
+
+// 3. Decide what information the View needs
+
+// This is where I'd encourage you not to overcomplicate things.
+
+// Your View doesn't need the entire GameBoard after every click.
+
+// It mostly needs:
+
+// For a shot
+// Which board changed?
+// Which row?
+// Which column?
+// What is now visible at that cell?
+
+// For example, conceptually:
+
+// Foe board
+// → row 4
+// → column 7
+// → result: hit
+
+// Then your Handler can find the corresponding DOM element and change its appearance.
+
+// Your existing:
+
+// data-row
+// data-col
+
+// are therefore exactly the sort of thing you want.
+
+// 4. Give your cells a consistent visual identity
+
+// There's one thing in your current renderGrid() that you'll need to reconcile.
+
+// You're checking:
+
+// cell.matches('.cell')
+
+// in your board listener.
+
+// But the cells you're creating don't currently appear to receive a .cell class.
+
+// That's something to fix before continuing.
+
+// Conceptually, every DOM cell should have:
+
+// a predictable class identifying it as a cell
+// its row
+// its column
+
+// You've already got the coordinates.
+
+// So your DOM structure should give you a very simple relationship:
+
+// Game state coordinate (4, 7)
+
+// ↕
+
+// DOM cell [row=4][col=7]
+
+// That's the key relationship your update methods will rely upon.
+
+// 5. Then build your individual-cell update methods
+
+// Now we get to the thing you originally asked about.
+
+// You have:
+
+// updateAllyGrid()
+// updateFoeGrid()
+
+// I'd actually pause before deciding exactly what those methods should do.
+
+// Ask yourself:
+
+// "Does this method need to update an entire grid, or does it need to update a particular cell?"
+
+// Your current naming suggests whole-grid updates.
+
+// But your intended architecture is actually:
+
+// "Update this particular cell."
+
+// So I'd think in terms of a smaller responsibility:
+
+// Find the DOM cell at (row, col) → apply the visual state it should have.
+
+// Then your board-specific methods can use that.
+
+// You don't necessarily need a completely separate system for every possible game event.
+
+// 6. Don't let the DOM inspect your domain objects
+
+// This is especially important with your getPlayerGrid() method.
+
+// I actually like what you're doing here:
+
+// You aren't handing your raw GameBoard / Ship objects to the DOM.
+
+// You're creating a view model containing things such as:
+
+// hit
+// miss
+// limited ship information
+
+// That's a good separation.
+
+// I'd continue that philosophy.
+
+// The DOM should be able to ask:
+
+// "What should this cell look like?"
+
+// without knowing:
+
+// how Ship works
+// how GameBoard.receiveAttack() works
+// how ship HP works
+// how sinking works
+// how the fleet is stored
+
+// Those belong to your model/game logic.
+
+// 7. Decide what the player is actually allowed to see
+
+// This is particularly important for your foe board.
+
+// Your underlying enemy board might know:
+
+// (4,7) contains a ship.
+
+// But before that cell has been attacked, the player's DOM shouldn't know that.
+
+// So your view model eventually needs to distinguish between:
+
+// Ally board
+
+// The player can see:
+
+// their ships
+// hits
+// misses
+// sunk ships
+// Foe board
+
+// The player should see:
+
+// unknown cells
+// hits
+// misses
+// perhaps sunk ships
+
+// But not untouched enemy ships.
+
+// This is one of the reasons your view-model approach is useful.
+
+// The Controller can expose information appropriate for the UI rather than simply exposing the raw board.
+
+// 8. Handle ship placement separately from attacking
+
+// This is the next big area I'd tackle after your cell updating works.
+
+// During "strategy" mode, clicking an ally cell means something completely different from clicking a foe cell during "playing".
+
+// You therefore have two distinct interactions:
+
+// Deployment phase
+
+// Click ally board:
+
+// coordinate
+// → Controller
+// → attempt to place ship
+// → GameBoard changes
+// → update affected ally cells
+
+// Battle phase
+
+// Click foe board:
+
+// coordinate
+// → Controller
+// → attack
+// → GameBoard changes
+// → update affected foe cell
+// → possibly update status
+// → possibly switch turn
+// → possibly trigger AI
+
+// I'd keep these conceptual flows separate rather than trying to make one giant "cell update" system understand all game mechanics.
+
+// 9. Then deal with the AI
+
+// Once human-vs-human interaction works, I'd move to:
+
+// Player attacks
+// → resolve attack
+// → update foe DOM
+// → determine whether game continues
+// → AI takes turn
+// → AI chooses coordinate
+// → Controller resolves AI attack
+// → update ally DOM
+// → determine whether game continues
+
+// Notice something important here:
+
+// The AI should not manipulate the DOM.
+
+// The AI belongs in your game logic.
+
+// The Controller orchestrates it.
+
+// The Handler renders the result.
+
+// That separation will save you a lot of pain later.
+
+// 10. Add game-over handling last
+
+// Once attacks, turns and AI work, then introduce:
+
+// winner detection
+// disabling further attacks
+// final status message
+// perhaps visual indication of the winning/losing board
+// reset
+
+// Don't try to solve reset and game-over while you're still establishing the basic attack → DOM-update cycle.
+
+// I'd structure your remaining work roughly like this
+
+// You're currently around here:
+
+// DOM rendering
+//       ↓
+// DOM listeners
+//       ↓
+// coordinates
+//       ↓
+// Controller
+//       ↓
+// GameBoard
+
+// Your next milestone is:
+
+// DOM click
+//     ↓
+// coordinates
+//     ↓
+// Controller
+//     ↓
+// game action
+//     ↓
+// GameBoard changes
+//     ↓
+// Controller knows what changed
+//     ↓
+// Handler receives result
+//     ↓
+// find corresponding DOM cell
+//     ↓
+// change that cell
+
+// Then build outward:
+
+// Individual cell updates
+//         ↓
+// Ship placement
+//         ↓
+// Attack / hit / miss
+//         ↓
+// Turns
+//         ↓
+// AI
+//         ↓
+// Game over
+//         ↓
+// Reset
+// One thing I'd strongly recommend
+
+// Don't build updateAllyGrid() and updateFoeGrid() yet.
+
+// First figure out this question:
+
+// "After controller.handleBoardClicks(x, y) finishes, what information does the Handler need in order to update the UI correctly?"
+
+// That's the architectural question sitting immediately in front of you.
+
+// Once you've answered that, the actual DOM update becomes quite straightforward.
+
+// And yes: your idea of updating only the affected cell rather than re-rendering the entire board is the approach I'd recommend for this project. Your existing data-row / data-col setup is already pointing you in that direction.
+
+// If you want, your next exercise should be to design the information flow for one single scenario — "player clicks an enemy cell and hits a ship" — without writing any code yet. That's the perfect next step before you implement anything.

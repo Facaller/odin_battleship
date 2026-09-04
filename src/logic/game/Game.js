@@ -75,9 +75,9 @@ export class Controller {
     }
 
     handleBoardClicks (x, y) {
-        if (this.gameState === "strategy") {
+        if (this.gameState.status === "strategy") {
             this.setShip(x, y);
-        } else if (this.gameState === "playing") {
+        } else if (this.gameState.status === "playing") {
             this.playTurn(x, y);
         }
     }
