@@ -49,7 +49,7 @@ export class Controller {
             return this.player1;
         }
     }
-//use these to get specific grids
+
     getPlayerOneGrid () {
         return this.getPlayerGrid(this.player1);
     }

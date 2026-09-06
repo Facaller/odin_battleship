@@ -181,6 +181,14 @@ export class Handler {
     }
 }
 
+
+// handleBoardClicks (x, y) {
+//     const result = this.controller.handleBoardClicks(x, y);
+
+//     if (!result) return;
+
+//     this.updateBoard(result);
+// }
 // Step 1 — Fix the connection between your DOM cells and your click listener
 
 // Before doing anything else, make sure every rendered cell is actually identifiable as a cell.
