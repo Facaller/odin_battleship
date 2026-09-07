@@ -76,9 +76,9 @@ export class Controller {
 
     handleBoardClicks (x, y) {
         if (this.gameState.status === "strategy") {
-            this.setShip(x, y);
+            return this.setShip(x, y);
         } else if (this.gameState.status === "playing") {
-            this.playTurn(x, y);
+            return this.playTurn(x, y);
         }
     }
 
@@ -128,6 +128,7 @@ export class Controller {
         
         this.nextTurn();
         this.playAiTurn();
+        return true;
     }
 
     getAiCoords () {
