@@ -20,7 +20,7 @@ export class Handler {
         
         this.init();
     }
-
+//start fiduring our why grid is not rendering
     init () {
         this.bindButtonEvents();
         this.bindBoardEvents();
