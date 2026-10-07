@@ -88,6 +88,7 @@ export class Handler {
     renderGrid (grid, gridContainer) {
         grid.forEach((row, rowIndex) => {
             const rowElement = document.createElement('div');
+            rowElement.classList.add('row');
 
             row.forEach((_, colIndex) => {
                 const cellElement = document.createElement('div');
@@ -107,6 +108,10 @@ export class Handler {
         const allyBoard = this.elements.allyBoard;
 
         this.renderGrid(allyGrid, allyBoard);
+        console.log('allyGrid:', allyGrid);
+        console.log('allyBoard:', allyBoard);
+        
+        
     }
 
     renderFoeGrid () {
@@ -114,6 +119,7 @@ export class Handler {
         const foeBoard = this.elements.foeBoard;
 
         this.renderGrid(foeGrid, foeBoard);
+
     }
 
     updateAllyGrid () {

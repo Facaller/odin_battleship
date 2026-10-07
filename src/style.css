@@ -36,14 +36,26 @@ html, body {
     justify-content: space-evenly;
 }
 
-.ally-board {
+.ally-board,
+.foe-board {
+    display: flex;
+    flex-direction: column;
     border: 1px solid black;
-    padding: 200px;
 }
 
-.foe-board {
+.row {
+    display: flex;
+}
+
+.cell {
+    width: 30px;
+    height: 30px;
     border: 1px solid black;
-    padding: 200px
+    
+}
+
+.cell:hover {
+    cursor: pointer;
 }
 
 /* buttons next */
