@@ -108,10 +108,6 @@ export class Handler {
         const allyBoard = this.elements.allyBoard;
 
         this.renderGrid(allyGrid, allyBoard);
-        console.log('allyGrid:', allyGrid);
-        console.log('allyBoard:', allyBoard);
-        
-        
     }
 
     renderFoeGrid () {
@@ -119,9 +115,8 @@ export class Handler {
         const foeBoard = this.elements.foeBoard;
 
         this.renderGrid(foeGrid, foeBoard);
-
     }
-
+// start here. need to figure out where and when to call the renderGrid method.
     updateAllyGrid () {
         
     }
@@ -188,7 +183,6 @@ export class Handler {
 
     handleBoardClicks (x, y) {
         const result = this.controller.handleBoardClicks(x, y);
-
         if (!result) return;
 
         this.updateBoard(result);
