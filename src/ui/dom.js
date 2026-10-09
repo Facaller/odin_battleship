@@ -20,7 +20,7 @@ export class Handler {
         
         this.init();
     }
-//start fiduring our why grid is not rendering
+
     init () {
         this.bindButtonEvents();
         this.bindBoardEvents();
@@ -30,10 +30,6 @@ export class Handler {
 
     updateStatus (message) {
         this.elements.status.textContent = message;
-    }
-
-    updateBoard (result) {
-
     }
 
 //status & button methods
@@ -117,6 +113,10 @@ export class Handler {
         this.renderGrid(foeGrid, foeBoard);
     }
 // start here. need to figure out where and when to call the renderGrid method.
+    updateBoard (grid, gridContainer) {
+        
+    }    
+
     updateAllyGrid () {
         
     }
