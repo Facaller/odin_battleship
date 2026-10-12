@@ -117,11 +117,11 @@ export class Handler {
         
     }    
 
-    updateAllyGrid () {
+    updateAllyBoard () {
         
     }
 
-    updateFoeGrid () {
+    updateFoeBoard () {
 
     }
 

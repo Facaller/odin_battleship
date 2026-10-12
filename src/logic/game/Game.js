@@ -159,200 +159,249 @@ export class Controller {
 
 }
 
-// Looking at both modules together, I'd focus less on rendering optimization now and more on making the flow of game actions, state changes, and UI updates predictable. You're at a good stage to establish those habits before the DOM Handler gets much larger.
+// The key idea to keep in mind is that your Gameboard should be the source of truth, and your DOM should be a visual representation of that state.
 
-// There are several good decisions here, but I also see a few genuine logic issues worth addressing before you build further on top of this structure.
+// Step 1: Decide what updateBoard is responsible for
+// Look at your existing methods:
 
-// 1. Your biggest issue: playTurn() doesn't reliably communicate what happened
-// Consider this section of your controller:
+// getPlayerOneGrid() retrieves a copy of player one's grid.
 
-// js
-// playTurn (x, y) {
-//     if (this.gameState.status !== "playing") return false;
+// getPlayerTwoGrid() retrieves a copy of player two's grid.
 
-//     const opponent = this.getOpponent(this.gameState.turn);
+// renderGrid(grid, gridContainer) creates DOM elements based on a grid.
 
-//     this.gameState.turn.attack(opponent, x, y);
+// updateBoard() is intended to refresh the display after an action.
 
-//     if (this.checkWinCondition()) return;
+// Ask yourself: what information does renderGrid() need to do its job?
 
-//     this.nextTurn();
-//     this.playAiTurn();
-//     return true;
-// }
-// There are two things I'd investigate.
+// You've already given it two parameters:
 
-// First, you're ignoring the result of attack().
+// The grid data to render.
 
-// What happens if the selected cell has already been attacked? Does attack() reject that move? If so, your controller currently advances the turn regardless, unless that behavior is handled elsewhere.
+// The DOM container in which to render it.
 
-// Your controller should make the distinction between an invalid action and a valid action explicit. Otherwise, the UI could respond to a move that shouldn't have happened.
+// That suggests a useful design principle: keep updateBoard() focused on coordinating the update, rather than making it responsible for figuring out what happened in the game.
 
-// Second, the return value isn't consistent.
+// Here's your first question to consider:
 
-// An invalid game phase returns false.
+// If you want to update the ally grid, how would updateBoard() know which grid data to retrieve and which DOM container to update?
 
-// A winning attack returns undefined.
+// Think about whether those responsibilities belong inside updateBoard() or in the methods that call it.
 
-// A non-winning attack returns true.
+// Step 2: Understand what your controller's boolean return values mean
+// Currently, your controller methods return booleans from setShip() and attack().
 
-// This matters because your DOM Handler uses the return value to decide whether to update the board:
+// That's not necessarily a problem. A boolean can communicate something very useful:
 
-// js
-// const result = this.controller.handleBoardClicks(x, y);
-// if (!result) return;
+// true: the requested action was accepted.
 
-// this.updateBoard(result);
-// The handler currently treats the return value as both an indication of success and the data needed for rendering, even though your controller returns only a boolean-like result.
+// false: the requested action was rejected.
 
-// I'd separate those concepts mentally, even if you don't implement a more sophisticated result object yet. Decide what a successful action means, what an invalid action means, and what the view needs to know afterward.
+// Your handleBoardClicks() method already uses this idea:
 
-// 2. Your turn-management logic deserves particular attention
-// Your controller handles player turns, AI turns, and win detection. That's a reasonable place for this coordination, but the order of operations matters.
+// It calls the controller.
 
-// For example, suppose the human player makes a winning attack.
+// It checks the result.
 
-// Your code checks the win condition before calling nextTurn(), which is sensible because the current player is the attacker and should be recorded as the winner.
+// It stops if the result is falsy.
 
-// But now consider an ordinary human attack against an AI opponent:
+// Now consider a distinction between two separate questions:
 
-// The human attacks.
+// Did the action succeed?
 
-// The controller checks for a win.
+// What should the board look like after the action?
 
-// The turn advances to the AI.
+// A boolean can answer the first question, but it doesn't tell the DOM handler which board state to display.
 
-// The AI attacks.
+// However, does it need to? You already have methods that retrieve the current grid state.
 
-// The controller checks for a win again.
+// Your next task: Trace what happens after setShip() returns true. The Gameboard has presumably changed. How could your DOM handler retrieve the updated state without needing setShip() to return that state as well?
 
-// The turn advances back to the human.
+// Try answering that before changing your controller methods.
 
-// That sequence is understandable, but it raises a presentation question: what happens if the AI wins?
+// Step 3: Decide whether to return a boolean or data
+// There are two reasonable approaches to think about.
 
-// Your playAiTurn() returns nothing, and playTurn() returns true after calling it. The DOM Handler therefore receives no explicit indication that the AI has ended the game.
+// Approach A: Keep the boolean
+// The controller reports whether the action was valid. If it was, the DOM handler retrieves the latest grid copy and refreshes the relevant display.
 
-// You can still solve this without complicating your architecture. Just make sure the controller's action result accounts for everything that happens during the complete turn, including the AI's response.
+// Best to explore first, given your current architecture.
 
-// I'd also avoid letting the DOM Handler independently infer the winner or decide whether the game should advance. Those decisions belong in the game logic.
+// Approach B: Return richer information
+// The controller returns something that communicates more than success or failure, such as which player was affected or what kind of action occurred.
 
-// 3. setShip() is doing more than its name suggests
-// js
-// setShip (x, y) {
-//     if (this.gameState.status !== "strategy") return false;
+// This can be useful when the interface needs more information than a simple refresh, but it introduces additional design decisions.
 
-//     const placed = this.gameState.turn.initialiseShip(x, y);
-//     if (!placed) return false;
+// For your current goal, I would start by exploring Approach A.
 
-//     this.startGame();
-//     return true;
-// }
-// This is one of the more subtle design choices I'd reconsider.
+// You already have a way to obtain the grid after an action. Returning the entire grid from every action method could duplicate a responsibility that your getter methods already handle.
 
-// The method places a ship, but it also attempts to start the game. That couples two operations that conceptually have separate purposes.
+// One important caveat: if you later need to distinguish between different outcomes, such as a hit, a miss, or a sunk ship, you may want a richer result. You don't need to solve that problem just to get your grid rendering correctly.
 
-// I can see why you've done it: once the fleet is complete, the game should transition into the playing phase. But ask yourself whether placing a ship should be responsible for deciding when the game begins, or whether the game-starting process should be responsible for checking fleet readiness.
+// Step 4: Work out which board needs updating
+// This is where your question about one parameter versus two becomes interesting.
 
-// Neither approach is inherently wrong for a small project. The important consideration is whether the method's behavior is predictable from its name.
+// Your updateBoard(grid, gridContainer) signature makes sense if its responsibility is to render a supplied grid into a supplied container.
 
-// I'd lean toward keeping those responsibilities separate. Your startGame() method already exists, so let it own the transition into the playing phase. Your placement method can report whether placement succeeded, and the surrounding game flow can determine what happens next.
+// But your code also has these methods:
 
-// Also, consider whether you actually want the final ship placement to start the game automatically or whether the player should explicitly press Start. That's a gameplay decision as much as an architectural one.
+// updateAllyBoard()
 
-// 4. Your rendering methods need a clearer contract
-// This is where your two modules currently disagree.
+// updateFoeBoard()
 
-// Your DOM Handler has:
+// What do those names suggest about their responsibilities?
 
-// js
-// updateBoard (grid, gridContainer) {
+// Consider the following design questions:
 
-// }
-// But your click handler does this:
+// Should updateBoard() have to know which player owns the grid?
 
-// js
-// const result = this.controller.handleBoardClicks(x, y);
-// if (!result) return;
+// Or should updateAllyBoard() and updateFoeBoard() each retrieve the appropriate grid and container, then pass them to updateBoard()?
 
-// this.updateBoard(result);
-// The arguments don't match. updateBoard() expects a grid and a container, but you're passing a boolean.
+// If you choose the second option, which method becomes responsible for deciding what to update, and which method simply performs the rendering?
 
-// That's completely understandable at this stage because you're still working out the design. However, before implementing the method, I'd settle on its contract.
+// Notice how this lets you separate the decision about which board from the work of rendering a board.
 
-// Ask yourself:
+// You don't need to change the parameter count yet. First, decide which method should own each responsibility.
 
-// Does updateBoard() receive a board's current state and its container?
+// Step 5: Follow one click through your code
+// Let's mentally trace a click on a cell in the foe grid.
 
-// Does it retrieve the state itself from the controller?
+// 1. Board event listener
 
-// Does it receive an action result and determine which board needs refreshing?
+// Reads the clicked cell's coordinates
 
-// I'd favor having your rendering methods work with the board's current state, rather than making them responsible for interpreting game actions. Keep action coordination in the handler and board data retrieval in the controller.
+// 2. handleBoardClicks(x, y)
 
-// One practical issue: your current renderGrid() appends elements without clearing the existing container. If you intend to use it for full-board rerendering, repeated calls will duplicate the rows and cells. Decide whether the rendering method creates a board from scratch or updates an existing one, and make its behavior consistent with that responsibility.
+// Asks the controller to process the action
 
-// Also, renderGrid() currently ignores the cell data using row.forEach((_, colIndex) => ...). That's fine for constructing the initial grid structure, but you'll eventually need to use the state to assign the appropriate visual classes for ships, hits, and misses.
+// 3. Controller
 
-// 5. Be aware that an AI turn affects two boards
-// This is particularly important for your proposed rendering approach.
+// Validates the action and updates the game state if appropriate
 
-// Suppose the human attacks the opponent's board, then the AI immediately attacks the human's board.
+// 4. DOM handler
 
-// The complete action changes two separate board states:
+// Checks success, then decides which board display needs refreshing
 
-// The opponent's board reflects the human's attack.
+// 5. Retrieve grid and render
 
-// The human's board reflects the AI's attack.
+// Uses the current Gameboard state to update the display
 
-// If your handler updates only the board that was clicked, the human's board won't reflect the AI's response unless you account for it separately.
+// There is one detail worth investigating here: your handleBoardClicks(x, y) currently receives coordinates from both board listeners, but it doesn't receive any indication of which board was clicked.
 
-// This is a good example of why the rendering strategy should follow the actual state changes, rather than assuming the clicked cell is the only thing that needs updating.
+// Ask yourself: Can your controller determine which player or board the coordinates refer to, or does it need more context?
 
-// You can still retain full-board rendering. You just need a clear way to determine which boards should be refreshed after a complete turn.
+// You may already handle that distinction inside playTurn() or setShip(). If so, great. If not, you'll need to resolve that before the DOM handler can reliably decide which display to refresh.
 
-// 6. Your event handling could be a little more expressive
-// Your event listeners are broadly fine. Event delegation is a good choice for a grid because you can attach one listener to the board instead of attaching a separate listener to every cell.
+// Also, because your goal is to rerender after any valid action, think about whether an action can affect one board or both boards. Don't assume that every successful action necessarily affects only the board that received the click.
 
-// Two small considerations:
+// Step 6: One rendering detail to watch out for
+// Your current renderGrid() creates new rows and cells and appends them to gridContainer.
 
-// Identify which board was clicked. In the code shown, both listeners call handleBoardClicks(x, y) without passing the board identity. You mentioned that you have a method distinguishing the affected board, so make sure the clicked board is available wherever that decision is made.
+// What happens if you call it twice on the same container?
 
-// Consider closest('.cell') instead of matches('.cell'). Your current code works if the cell itself is always the event target. If you later put a child element inside a cell, such as an icon or marker, matches() won't find the cell from that child. closest() makes the handler more resilient.
+// The previous rows aren't automatically removed. You'll end up appending another grid to the existing one.
 
-// I wouldn't spend much time abstracting these listeners further until you have more interaction types. Their current structure is easy to understand.
+// Before you wire up updateBoard(), decide how your rendering method should handle existing DOM elements. You could either:
 
-// 7. A few smaller controller observations
-// These aren't all urgent, but they're worth keeping in mind.
+// Clear the container before rebuilding its contents.
 
-// startGame() repeats its readiness check
-// You check the game phase and fleet readiness, then repeat both checks in a second if. The second condition is redundant after the first checks have passed.
+// Update existing cells in place rather than recreating the grid.
 
-// Simplifying this would make the method easier to read.
+// For your current stage, rebuilding the grid is simpler to reason about. Just make sure the container doesn't accumulate duplicate rows.
 
-// getOpponent() could be more explicit
-// Your method returns player two whenever the argument isn't player one. That works if it can only receive those two player instances. If that assumption is important, consider whether an unexpected argument should be handled explicitly instead of silently returning player one.
+// One more thought: your grid copy contains hit, miss, and ship information, but your current renderer ignores the cell data with row.forEach((_, colIndex) => ...). Eventually, the rendering logic will need to inspect each cell's state to decide how it should appear. Otherwise, rerendering will recreate the grid without showing the changes that occurred.
 
-// getPlayerGrid() is a useful boundary
-// I like that you're returning plain data instead of exposing the board's internal objects directly to the DOM layer.
+// Your turn: let's solve the first design decision
+// I don't want to jump ahead and give you the implementation, so let's start with one question.
 
-// One subtlety: your returned ship properties are snapshots of the ship state, not live references. That is a good thing for presentation, but it means the view needs to retrieve fresh data whenever it rerenders.
+// Imagine setShip(x, y) returns true and the Gameboard has been updated. Your DOM handler now needs to refresh the ally board.
 
-// Your Elements class is reasonable
-// Collecting DOM references in one place is a perfectly sensible choice. I wouldn't introduce more abstraction around it yet. Just remember that querySelector() can return null if an element is missing, so initialization errors can be easier to diagnose if you validate required elements.
+// Step 1: Think about separation of responsibilities
+// You've proposed this relationship:
 
-// What I'd prioritize next
-// I'd work through these in order:
+// updateAllyBoard() retrieves the ally's current grid.
 
-// Fix action-result consistency. Make sure invalid actions, valid moves, and winning moves have predictable outcomes, particularly when the AI responds.
+// updateBoard() receives that grid and handles the rendering.
 
-// Settle the rendering contract. Decide what updateBoard() receives and which layer retrieves the latest grid state.
+// Ask yourself: Does each method now have one clear responsibility?
 
-// Implement board refreshes. Keep the initial full render and reuse the rendering approach for subsequent updates, making sure existing DOM elements are handled correctly.
+// Your updateAllyBoard() knows which board you want to refresh. Your updateBoard() doesn't need to know anything about players, game phases, or controller logic. It just needs the data to render and somewhere to render it.
 
-// Verify turn and board coordination. Test human attacks, AI responses, invalid attacks, ship placement, and game completion.
+// That's a useful separation of concerns.
 
-// Refine responsibilities. Revisit the coupling between ship placement and game startup once the core interaction flow works.
+// Step 2: Decide what updateBoard() needs
+// Look at your existing method:
 
-// My overall assessment: your modules are reasonably structured for this stage of the project. You're already separating game logic from DOM manipulation, keeping DOM references centralized, and using event delegation. Those are worthwhile habits.
+// renderGrid(grid, gridContainer)
 
-// The main thing I'd challenge you on is not whether to rerender 100 cells. It's whether your controller communicates a complete, unambiguous outcome for each action and whether your DOM Handler can reliably translate that outcome into the correct visual state.
+// It already receives two things. Your proposed updateBoard() could follow a similar design.
+
+// Think about the two pieces of information it needs:
+
+// The latest grid state.
+
+// The DOM container that represents that grid.
+
+// Now ask yourself: if updateBoard() receives both of those things, does it need to call the controller at all?
+
+// If the answer is no, you've made the rendering layer more independent of the game logic. That's generally a good thing.
+
+// Step 3: Consider why you have two wrapper methods
+// You have both updateAllyBoard() and updateFoeBoard().
+
+// Imagine you later change how the ally grid is retrieved, or how its container is identified. If those details live inside updateAllyBoard(), would you need to change the generic rendering method too?
+
+// Ideally, no.
+
+// The same principle applies to updateFoeBoard(). Each wrapper knows its own board, while the shared rendering method handles the common work.
+
+// This also avoids duplicating rendering logic across the two boards.
+
+// Step 4: Connect this to your boolean return values
+// Let's return to your original question.
+
+// Your controller reports whether an action succeeded. Your DOM handler uses that result to decide whether an update is needed.
+
+// Consider this sequence:
+
+// The user clicks a cell.
+
+// The controller attempts the action.
+
+// The action is rejected, so nothing needs to be rerendered.
+
+// Alternatively, the action succeeds, so the handler initiates the appropriate board update.
+
+// The board-update method retrieves the latest state and passes it to the rendering method.
+
+// Notice that the boolean and the grid copy serve different purposes. The boolean tells you whether to update; the grid copy tells you what to display.
+
+// You don't necessarily need to change your controller's return types to achieve this.
+
+// One subtle point: make sure the controller's boolean genuinely means that the action was accepted and the relevant state was updated, rather than merely that the request was processed.
+
+// Step 5: Here's the next problem to solve
+// There's one remaining design decision in your current code.
+
+// Both allyBoard and foeBoard call the same method:
+
+// handleBoardClicks(x, y)
+
+// But your method currently receives only coordinates.
+
+// Suppose a valid attack changes the foe's board. How will handleBoardClicks() know whether to call updateAllyBoard() or updateFoeBoard()?
+
+// You have two possible directions to investigate:
+
+// The controller already knows which board an action affects, so you can use that knowledge to determine what to refresh.
+
+// The DOM handler can identify which board received the click and pass that context along.
+
+// Neither choice is automatically right for every game architecture. The important thing is to avoid guessing based solely on the coordinates, because (2, 3) could refer to a cell on either board.
+
+// Your next question
+// In your Battleship game, when the user clicks a cell on the foe grid during the playing phase, does your playTurn() method already know that it's attacking player two's board?
+
+// Or does playTurn() currently receive only (x, y) and have to figure out which board to target some other way?
+
+// Tell me how that part works, and we'll reason through the cleanest way to connect a successful action to the correct board update.
