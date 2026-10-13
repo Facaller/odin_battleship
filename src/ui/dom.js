@@ -114,15 +114,32 @@ export class Handler {
     }
 // start here. need to figure out where and when to call the renderGrid method.
     updateBoard (grid, gridContainer) {
-        
+        grid.forEach((row, rowIndex) => {
+            row.forEach((cell, colIndex) => {
+                const cellElement = gridContainer.querySelector(
+                    `.cell[data-row="${rowIndex}"][data-col="${colIndex}"]`
+                );
+
+                if (!cellElement) return;
+
+                cellElement.classList.toggle('hit', cell.hit);
+                cellElement.classList.toggle('miss', cell.miss);
+            });
+        });
     }    
 
     updateAllyBoard () {
-        
+        const allyGrid  = this.controller.getPlayerOneGrid();
+        const allyBoard = this.elements.allyBoard;
+
+        this.updateBoard(allyGrid, allyBoard);
     }
 
     updateFoeBoard () {
+        const foeGrid  = this.controller.getPlayerTwoGrid();
+        const foeBoard = this.elements.foeBoard;
 
+        this.updateBoard(foeGrid, foeBoard);
     }
 
 // events
@@ -185,7 +202,7 @@ export class Handler {
         const result = this.controller.handleBoardClicks(x, y);
         if (!result) return;
 
-        this.updateBoard(result);
+        this.updateBoard();
     }
 }
 
