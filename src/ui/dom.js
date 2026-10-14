@@ -112,7 +112,7 @@ export class Handler {
 
         this.renderGrid(foeGrid, foeBoard);
     }
-// start here. need to figure out where and when to call the renderGrid method.
+
     updateBoard (grid, gridContainer) {
         grid.forEach((row, rowIndex) => {
             row.forEach((cell, colIndex) => {
@@ -124,6 +124,7 @@ export class Handler {
 
                 cellElement.classList.toggle('hit', cell.hit);
                 cellElement.classList.toggle('miss', cell.miss);
+                cellElement.classList.toggle('ship', cell.ship);
             });
         });
     }    
@@ -202,7 +203,8 @@ export class Handler {
         const result = this.controller.handleBoardClicks(x, y);
         if (!result) return;
 
-        this.updateBoard();
+        this.updateAllyBoard();
+        this.updateFoeBoard();
     }
 }
 
