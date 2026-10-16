@@ -67,6 +67,8 @@ export class Handler {
             this.updateStatus('The time for strategy has passed');
             return;
         } else {
+            this.updateAllyBoard();
+            this.updateFoeBoard();
             this.updateStatus('Fleet deployed');
         }
     }
@@ -202,6 +204,7 @@ export class Handler {
     handleBoardClicks (x, y) {
         const result = this.controller.handleBoardClicks(x, y);
         if (!result) return;
+        console.log(`x = ${x} y = ${y}`);
 
         this.updateAllyBoard();
         this.updateFoeBoard();

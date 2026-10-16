@@ -24,14 +24,18 @@ export class GameBoard {
     }
 //might need to add orientation check here
     validateShipCoords (ship, x, y) {
-        if (x + ship.length > this.rows) return false;
-        if (y + ship.length > this.cols) return false;
-        
-        for (let i = 0; i < ship.length; i++) {
-            if (this.grid[x+i][y].ship !== null) return false;
-        }
-        for (let i = 0; i < ship.length; i++) {
-            if (this.grid[x][y+i].ship !== null) return false;
+        if (this.orientation === 'horizontal') {
+            if (x + ship.length > this.rows) return false;
+            
+            for (let i = 0; i < ship.length; i++) {
+                if (this.grid[x + i][y].ship !== null) return false;
+            }
+        } else {
+            if (y + ship.length > this.cols) return false;
+
+            for (let i = 0; i < ship.length; i++) {
+                if (this.grid[x][y + i].ship !== null) return false;
+            }
         }
         return true;
     }
