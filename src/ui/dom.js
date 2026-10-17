@@ -74,9 +74,9 @@ export class Handler {
     }
 
     shipOrientation () {
-        const setOrientation = this.controller.setOrientation();
+        const success = this.controller.toggleOrientation();
 
-        if (!setOrientation) {
+        if (!success) {
             this.updateStatus('The time for strategy has passed');
         } else {
             this.updateStatus('Strategic placement confirmed');

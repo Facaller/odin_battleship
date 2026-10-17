@@ -22,7 +22,7 @@ export class GameBoard {
         if (y >= this.cols || y < 0) return false;
         return true;
     }
-//might need to add orientation check here
+
     validateShipCoords (ship, x, y) {
         if (this.orientation === 'horizontal') {
             if (x + ship.length > this.rows) return false;
@@ -52,6 +52,15 @@ export class GameBoard {
         this.orientation = direction;
     }
 
+    randomizeOrientation () {
+        const random = Math.floor(Math.random() * 10);
+        if (random % 2 === 0) {
+            this.setOrientation('horizontal');
+        } else {
+            this.setOrientation('vertical');
+        }
+    }
+
     createShip (hp) {
         return new Ship(hp);
     }
@@ -64,11 +73,11 @@ export class GameBoard {
 
         if (this.orientation === 'horizontal') {
             for (let i = 0; i < ship.length; i++) {
-                this.grid[x+i][y].ship = ship;
+                this.grid[x + i][y].ship = ship;
             }
         } else {
             for (let i = 0; i < ship.length; i++) {
-                this.grid[x][y+i].ship = ship;
+                this.grid[x][y + i].ship = ship;
             }
         }
 
@@ -103,6 +112,7 @@ export class GameBoard {
 
     deployFleet () {
         while (this.barracks.length > 0) {
+            this.randomizeOrientation();
             this.placeShipRandomly();
         }
 

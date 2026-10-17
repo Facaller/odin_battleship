@@ -23,10 +23,11 @@ export class Player {
     isFleetReady () {
         return this.board.checkFleet() ;
     }
-
-    setShipDirection () {
+// put this in Gameboard
+    toggleShipDirection () {
         const direction = direction === 'horizontal' ? 'vertical' : 'horizontal';
         this.board.setOrientation(direction);
+        console.log(`ship direction is ${direction}`);
     }
 
     attack (enemyBoard, x, y) {

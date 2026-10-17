@@ -31,10 +31,10 @@ export class Controller {
         return true;
     }
 
-    setOrientation () {
+    toggleOrientation () {
         if (this.gameState.status !== "strategy") return false;
         
-        this.gameState.turn.setShipDirection();
+        this.gameState.turn.toggleShipDirection();
         return true;
     }
 
