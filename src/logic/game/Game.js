@@ -10,11 +10,11 @@ export class Controller {
         this.gameState = {
             status:   "strategy",
             turn:     this.player1,
-            enableAi: false,
+            enableAi: true,
             winner:   null
         }
     }
-
+//start with AI and make it default 
     changeStatus (status) {
         this.gameState.status = status;
     }
@@ -34,7 +34,7 @@ export class Controller {
     toggleOrientation () {
         if (this.gameState.status !== "strategy") return false;
         
-        this.gameState.turn.toggleShipDirection();
+        this.gameState.turn.toggleOrientation();
         return true;
     }
 
