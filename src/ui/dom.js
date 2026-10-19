@@ -50,7 +50,7 @@ export class Handler {
     }
 
     aiToggle () {
-        const aiToggle = this.controller.battleAi();
+        const aiToggle = this.controller.toggleBattleAi();
 
         if (!aiToggle) {
             this.updateStatus('Battle is already underway')

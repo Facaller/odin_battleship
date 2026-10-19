@@ -24,10 +24,11 @@ export class Controller {
         this.gameState.turn === this.player1 ? this.player2 : this.player1
     }
 
-    battleAi () {
+    toggleBattleAi () {
         if (this.gameState.status !== "strategy") return false;
 
-        this.gameState.enableAi = this.gameState.enableAi === true ? false : true;
+        this.gameState.enableAi = 
+        this.gameState.enableAi === true ? false : true;
         return true;
     }
 
@@ -92,7 +93,11 @@ export class Controller {
             return true;
         }
     }
-
+// take start game out here. new idea:
+// check fleet after every placement
+// if fleet is ready & AI is on switch turns
+// do random deployment
+// call start game elsewhere, not in setShip
     setShip (x, y) {
         if (this.gameState.status !== "strategy") return false;
 
