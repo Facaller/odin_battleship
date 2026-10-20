@@ -103,8 +103,9 @@ export class Controller {
 
         const placed = this.gameState.turn.initialiseShip(x, y);
         if (!placed) return false;
+
+        this.handleFleetProgress();
         
-        this.startGame();
         console.log('ship set successfully');
         return  true;
     }
@@ -114,13 +115,23 @@ export class Controller {
 
         const placed = this.gameState.turn.initialiseFleet();
         if (!placed) return false;
+    }
 
+    createAiFleet () {
+        if (this.gameState.status !== "strategy") return false;
         if (this.gameState.enableAi === true) {
-            this.nextTurn();
             this.gameState.turn.initialiseFleet();
         }
-        
-        return this.startGame();
+    }
+
+    checkFleet () {
+        return this.gameState.turn.isFleetReady();
+    }
+
+    handleFleetProgress () {
+        if (!this.checkFleet()) return;
+
+        this.nextTurn();
     }
 
     playTurn (x, y) {
