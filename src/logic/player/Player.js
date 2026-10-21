@@ -23,7 +23,7 @@ export class Player {
     isFleetReady () {
         return this.board.checkFleet() ;
     }
-// put this in Gameboard
+
     toggleOrientation () {
         this.board.toggleOrientation();
     }

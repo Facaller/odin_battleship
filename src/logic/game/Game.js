@@ -103,8 +103,6 @@ export class Controller {
 
         const placed = this.gameState.turn.initialiseShip(x, y);
         if (!placed) return false;
-
-        this.handleFleetProgress();
         
         console.log('ship set successfully');
         return  true;
@@ -126,12 +124,6 @@ export class Controller {
 
     checkFleet () {
         return this.gameState.turn.isFleetReady();
-    }
-
-    handleFleetProgress () {
-        if (!this.checkFleet()) return;
-
-        this.nextTurn();
     }
 
     playTurn (x, y) {

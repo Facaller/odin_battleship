@@ -8,7 +8,10 @@ export class Computer {
             }
         }
     }
-
+// add ai mehtods here
+// player2 as in the constructor
+// use player2 methods, but ai makes the deicions
+// that way we use the same board instance
     takeRandomMove () {
         const index = Math.floor(Math.random() * this.availableMoves.length);
         const move  = this.availableMoves[index];
