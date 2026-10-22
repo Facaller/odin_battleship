@@ -5,7 +5,7 @@ export class Controller {
     constructor () {
         this.player1  = new Player();
         this.player2  = new Player();
-        this.computer = new Computer();
+        this.computer = new Computer(this.player2);
 
         this.gameState = {
             status:   "strategy",
