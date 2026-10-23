@@ -115,13 +115,6 @@ export class Controller {
         if (!placed) return false;
     }
 
-    createAiFleet () {
-        if (this.gameState.status !== "strategy") return false;
-        if (this.gameState.enableAi === true) {
-            this.gameState.turn.initialiseFleet();
-        }
-    }
-
     checkFleet () {
         return this.gameState.turn.isFleetReady();
     }
@@ -138,10 +131,6 @@ export class Controller {
         this.nextTurn();
         this.playAiTurn();
         return true;
-    }
-
-    getAiCoords () {
-        return this.computer.takeRandomMove();
     }
 
     playAiTurn () {
